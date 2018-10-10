@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BSharpUnilever.Controllers.Util;
+using BSharpUnilever.Data.Entities;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BSharpUnilever.Controllers.ViewModels
 {
@@ -20,6 +18,7 @@ namespace BSharpUnilever.Controllers.ViewModels
 
         [Required]
         [StringLength(255)]
+        [ChoiceList(Roles.KAE, Roles.Manager, Roles.Administrator, Roles.Inactive)]
         public string Role { get; set; }
 
         public bool EmailConfirmed { get; set; }

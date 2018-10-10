@@ -22,10 +22,10 @@ namespace BSharpUnilever.Services
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IsAdministratorRequirement requirement)
         {
             // Retrieve the user object using the injected user manager, and check its role
-            string username = context.User.Username();
+            string username = context.User.UserName();
             var user = await _userManager.FindByNameAsync(username);
 
-            if (user != null && user.Role == "Administrator")
+            if (user != null && user.Role == Roles.Administrator)
                 context.Succeed(requirement);
         }
     }

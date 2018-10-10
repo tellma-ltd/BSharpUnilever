@@ -95,9 +95,6 @@ namespace BSharpUnilever.Controllers.ViewModels
     {
         public int Id { get; set; }
 
-        public int SupportRequestId { get; set; }
-        public SupportRequestVM SupportRequest { get; set; }
-
         public int SerialNumber { get; set; }
 
         public int State { get; set; } // Valid (0), Void (-1)

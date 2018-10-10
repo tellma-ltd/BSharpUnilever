@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using BSharpUnilever.Controllers.ViewModels;
 using BSharpUnilever.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BSharpUnilever.Controllers.Mapper
 {
     /// <summary>
-    /// Defines the AutoMapper mappings
+    /// Defines the property mappings for AutoMapper
     /// </summary>
     public class BSharpProfile : Profile
     {
@@ -26,6 +22,38 @@ namespace BSharpUnilever.Controllers.Mapper
             CreateMap<Product, ProductVM>();
             CreateMap<ProductVM, Product>()
                 .ForMember(e => e.SupportRequestLineItems, opt => opt.Ignore());
+
+            CreateMap<SupportRequest, SupportRequestVM>();
+            CreateMap<SupportRequestVM, SupportRequest>()
+                // Navigation properties
+                .ForMember(e => e.AccountExecutive, opt => opt.Ignore())
+                .ForMember(e => e.AccountExecutiveId, opt => opt.MapFrom(e => e.AccountExecutive == null ? null : e.AccountExecutive.Id))
+                .ForMember(e => e.Manager, opt => opt.Ignore())
+                .ForMember(e => e.ManagerId, opt => opt.MapFrom(e => e.Manager == null ? null : e.Manager.Id))
+                .ForMember(e => e.Store, opt => opt.Ignore())
+                .ForMember(e => e.StoreId, opt => opt.MapFrom(e => e.Store == null ? 0 : e.Store.Id))
+
+                // Navigation collections
+                .ForMember(e => e.LineItems, opt => opt.Ignore())
+                .ForMember(e => e.StateChanges, opt => opt.Ignore())
+                .ForMember(e => e.GeneratedDocuments, opt => opt.Ignore())
+
+                // Readonly properties
+                .ForMember(e => e.Id, opt => opt.Ignore())
+                .ForMember(e => e.CreatedBy, opt => opt.Ignore())
+                .ForMember(e => e.Created, opt => opt.Ignore())
+                .ForMember(e => e.ModifiedBy, opt => opt.Ignore())
+                .ForMember(e => e.Modified, opt => opt.Ignore())
+                .ForMember(e => e.Date, opt => opt.Ignore())
+                .ForMember(e => e.SerialNumber, opt => opt.Ignore());
+
+            CreateMap<SupportRequestLineItem, SupportRequestLineItemVM>();
+            CreateMap<SupportRequestLineItemVM, SupportRequestLineItem>()
+                .ForMember(e => e.Product, opt => opt.Ignore())
+                .ForMember(e => e.ProductId, opt => opt.MapFrom(e => e.Product == null ? (int?)null : e.Product.Id));
+
+            // Note: Using the mapper profile like that to handle navigation properties and read only properties
+            // is fine for this small project, but we have a more robust technique in mind for projets of larger scale
         }
     }
 }

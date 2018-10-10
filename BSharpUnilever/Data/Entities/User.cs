@@ -25,4 +25,11 @@ namespace BSharpUnilever.Data.Entities
         public ICollection<SupportRequest> ManagedRequests { get; set; }
     }
 
+    public static class Roles
+    {
+        public const string KAE = "KAE";
+        public const string Manager = "Manager";
+        public const string Administrator = "Administrator";
+        public const string Inactive = "Inactive";
+    }
 }

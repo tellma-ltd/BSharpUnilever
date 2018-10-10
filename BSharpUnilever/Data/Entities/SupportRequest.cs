@@ -101,6 +101,8 @@ namespace BSharpUnilever.Data.Entities
 
         public string UserId { get; set; }
         public User User { get; set; }
+
+        public string UserRole { get; set; }
     }
 
     // Another weak entity, keep in the same file

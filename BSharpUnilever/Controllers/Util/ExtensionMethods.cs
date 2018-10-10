@@ -46,7 +46,7 @@ namespace BSharpUnilever.Controllers.Util
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static string Username(this ClaimsPrincipal user)
+        public static string UserName(this ClaimsPrincipal user)
         {
             return user.FindFirstValue(ClaimTypes.NameIdentifier);
         }

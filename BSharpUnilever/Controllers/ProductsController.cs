@@ -40,7 +40,7 @@ namespace BSharpUnilever.Controllers
             try
             {
                 // First project the model to the view model using AutoMapper
-                IQueryable<Product> query = _context.Products;
+                IQueryable<Product> query = _context.Products.AsNoTracking();
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
@@ -91,7 +91,7 @@ namespace BSharpUnilever.Controllers
             try
             {
                 // Retrieve the user and if missing return a 404
-                var result = await InternalGet(id);
+                var result = await InternalGetAsync(id);
                 if (result == null)
                 {
                     return NotFound($"Could not find a record with id='{id}'");
@@ -112,10 +112,10 @@ namespace BSharpUnilever.Controllers
         }
 
         // This method is reused in both Get(id) and Post(), DRY principal applied
-        private async Task<ProductVM> InternalGet(int id)
+        private async Task<ProductVM> InternalGetAsync(int id)
         {
             // Retrieve the user and if missing return a 404
-            Product record = await _context.Products
+            Product record = await _context.Products.AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             // All is good
@@ -141,7 +141,7 @@ namespace BSharpUnilever.Controllers
                     await _context.SaveChangesAsync();
 
                     // Map and return the newly created record in the same format as a GET request
-                    var resultModel = await InternalGet(newRecord.Id);
+                    var resultModel = await InternalGetAsync(newRecord.Id);
                     var resourceUrl = Url.Action(nameof(Get), nameof(ProductsController)); // TODO: Fix this bug
 
                     return Created(resourceUrl, resultModel);
@@ -160,7 +160,7 @@ namespace BSharpUnilever.Controllers
                     await _context.SaveChangesAsync();
 
                     // Finally return the same result you would get with a GET request
-                    var resultModel = await InternalGet(model.Id);
+                    var resultModel = await InternalGetAsync(model.Id);
                     return Ok(resultModel);
                 }
             }

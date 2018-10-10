@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BSharpUnilever.Controllers.Util;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace BSharpUnilever.Controllers.ViewModels
         public string SapCode { get; set; }
 
         [StringLength(255)]
+        [ChoiceList("HC", "PC", "F&R", "O")]
         public string Type { get; set; } // Home Care (HC), Personal Care (PC), Food & Refreshments (F&R), Other (O)
 
         public bool IsPromo { get; set; }

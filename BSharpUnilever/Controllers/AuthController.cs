@@ -63,21 +63,27 @@ namespace BSharpUnilever.Controllers
                     return BadRequest("Invalid email and password combination"); // The knowledge of which one is on-a-need-to-know-basis
                 }
 
-                //(2) have a confirmed email
+                // (2) have an active account
+                if (user.Role == Roles.Inactive)
+                {
+                    return BadRequest("The system administrator has deactivated this account");
+                }
+
+                // (3) have a confirmed email
                 bool confirmedEmail = await _userManager.IsEmailConfirmedAsync(user);
                 if (!confirmedEmail)
                 {
                     return BadRequest("This email is not confirmed yet, please go to your email inbox and find the email confirmation link that we sent you");
                 }
 
-                // (3) and supply a valid password
+                // (4) and supply a valid password
                 bool validPassword = await _userManager.CheckPasswordAsync(user, model.Password);
                 if (!validPassword)
                 {
                     return BadRequest("Invalid email and password combination"); // The knowledge of which one is on-a-need-to-know-basis
                 }
 
-                // If we reach here, the user is authentic, return an authentication back
+                // If we reach here then the user is authentic => return an authentication back
                 var tokenResponse = CreateJwtToken(user.UserName);
                 return Created("", tokenResponse);
             }
@@ -96,7 +102,7 @@ namespace BSharpUnilever.Controllers
             // keep the user session alive permanently as long as the client remains open
             try
             {
-                string userEmail = User.Username();
+                string userEmail = User.UserName();
                 var tokenResponse = CreateJwtToken(userEmail);
                 return Created("", tokenResponse);
             }

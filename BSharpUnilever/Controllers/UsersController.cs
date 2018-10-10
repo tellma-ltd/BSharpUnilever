@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace BSharpUnilever.Controllers
             try
             {
                 // First project the model to the view model using AutoMapper
-                IQueryable<User> query = _context.Users;
+                IQueryable<User> query = _context.Users.AsNoTracking();
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
@@ -156,7 +157,7 @@ namespace BSharpUnilever.Controllers
                     uri = QueryHelpers.AddQueryString(uri, "emailConfirmationToken", emailConfirmationToken);
                     uri = QueryHelpers.AddQueryString(uri, "passwordResetToken", passwordResetToken);
                     var htmlUri = HtmlEncoder.Default.Encode(uri);
-                    string currentUser = User.Username();
+                    string currentUser = User.UserName();
 
                     // Prepare the email template (in a larger app you would probably store such templates in files)
                     string htmlEmail = Util.Util.TranscludeInBSharpEmailTemplate(
@@ -194,6 +195,8 @@ namespace BSharpUnilever.Controllers
 
                     // Update the updatable properties and ignore the rest
                     user.FullName = model.FullName;
+                    user.Role = model.Role;
+
 
                     // Update in identity store using the userManager
                     IdentityResult result = await _userManager.UpdateAsync(user);

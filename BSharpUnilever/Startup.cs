@@ -96,7 +96,7 @@ namespace BSharpUnilever
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            // AutoMapper
+            // AutoMapper https://automapper.org/
             services.AddAutoMapper();
 
             // Custom services
