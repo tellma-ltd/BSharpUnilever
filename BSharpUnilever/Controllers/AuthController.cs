@@ -1,4 +1,5 @@
-﻿using BSharpUnilever.Controllers.ViewModels.Auth;
+﻿using BSharpUnilever.Controllers.Util;
+using BSharpUnilever.Controllers.ViewModels.Auth;
 using BSharpUnilever.Data.Entities;
 using BSharpUnilever.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -24,8 +26,8 @@ namespace BSharpUnilever.Controllers
     {
         // All issued tokens expire after 7 days, even though we intend
         // to keep users permanently signed in, it is still a good idea to
-        // set an expiry date and use a refresh endpoint instead. This
-        // ensures that there will be no lingering valid tokens on stolen
+        // set an expiry date and use a refresh endpoint. This
+        // ensures that there will be no lingering valid tokens on
         // e.g. stolen phones that remain valid after decades!
         private const double TOKEN_EXPIRY_DAYS = 7.0;
 
@@ -49,7 +51,7 @@ namespace BSharpUnilever.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest("There is something wrong with the request payload"); // TODO
+                return BadRequest("There is something wrong with the request payload"); // TODO: Return friendlier validation errors
             }
 
             try
@@ -81,24 +83,26 @@ namespace BSharpUnilever.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 return BadRequest(ex.Message);
             }
         }
 
-        [HttpGet("refresh-token")]
         [Authorize] // IMPORTANT!
+        [HttpGet("refresh-token")]
         public ActionResult<AuthenticationTokenResponseVM> RefreshToken()
         {
             // The client web app uses this endpoint to refresh the token every 1h in order to 
             // keep the user session alive permanently as long as the client remains open
             try
             {
-                string userEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string userEmail = User.Username();
                 var tokenResponse = CreateJwtToken(userEmail);
                 return Created("", tokenResponse);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 return BadRequest(ex.Message);
             }
         }
@@ -109,7 +113,7 @@ namespace BSharpUnilever.Controllers
             // This is called when the user presses the confirm email link that is sent to his/her inbox 
             if (!ModelState.IsValid)
             {
-                return BadRequest("There is something wrong with the request payload"); // TODO
+                return BadRequest("There is something wrong with the request payload"); // TODO: Return friendlier validation errors
             }
 
             try
@@ -126,11 +130,7 @@ namespace BSharpUnilever.Controllers
                 IdentityResult result = await _userManager.ConfirmEmailAsync(user, model.EmailConfirmationToken);
                 if (!result.Succeeded)
                 {
-                    string errorMessage = "could not confirm email";
-                    if (result.Errors.Any())
-                        errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-
-                    return BadRequest(errorMessage);
+                    return BadRequest(result.ErrorMessage("Could not confirm email"));
                 }
 
                 // All good
@@ -138,6 +138,7 @@ namespace BSharpUnilever.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 return BadRequest(ex.Message);
             }
         }
@@ -148,7 +149,7 @@ namespace BSharpUnilever.Controllers
             // This is called when the user clicks "forgot my password", and then submits an email address
             if (!ModelState.IsValid)
             {
-                return BadRequest("There is something wrong with the request payload"); // TODO
+                return BadRequest("There is something wrong with the request payload"); // TODO: Return friendlier validation errors
             }
 
             try
@@ -186,6 +187,7 @@ namespace BSharpUnilever.Controllers
                 // Send the email using injected sender
                 await _emailSender.SendEmail(
                     destinationEmailAddress: model.Email,
+                    subject: "Password Reset Link",
                     htmlEmail: htmlEmail);
 
                 // All good
@@ -193,6 +195,7 @@ namespace BSharpUnilever.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 return BadRequest(ex.Message);
             }
         }
@@ -203,7 +206,7 @@ namespace BSharpUnilever.Controllers
             // This is called when the user clicks "forgot my password", and then submits an email address
             if (!ModelState.IsValid)
             {
-                return BadRequest("There is something wrong with the request payload"); // TODO
+                return BadRequest("There is something wrong with the request payload"); // TODO: Return friendlier validation errors
             }
 
             try
@@ -219,11 +222,7 @@ namespace BSharpUnilever.Controllers
                 IdentityResult result = await _userManager.ResetPasswordAsync(user, model.PasswordResetToken, model.NewPassword);
                 if (result.Succeeded)
                 {
-                    string errorMessage = "could not reset password";
-                    if (result.Errors.Any())
-                        errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
-
-                    return BadRequest(errorMessage);
+                    return BadRequest(result.ErrorMessage("Could not reset password"));
                 }
                 else
                 {
@@ -234,6 +233,7 @@ namespace BSharpUnilever.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.StackTrace);
                 return BadRequest(ex.Message);
             }
         }
@@ -249,7 +249,7 @@ namespace BSharpUnilever.Controllers
             var jti = Guid.NewGuid().ToString();
 
             // These claims are the minimum requirement for a valid JWT token
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, email),
                 new Claim(JwtRegisteredClaimNames.Jti, jti)
@@ -264,6 +264,7 @@ namespace BSharpUnilever.Controllers
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(TOKEN_EXPIRY_DAYS),
                 signingCredentials: signingCredentials);
+            
 
             // Return the token wrapped inside a friendly data structure
             var tokenResponse = new AuthenticationTokenResponseVM

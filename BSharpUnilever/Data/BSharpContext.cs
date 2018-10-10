@@ -8,7 +8,7 @@ namespace BSharpUnilever.Data
     /// One context for both the application and the identity, 
     /// we do not have to separate them for such a small app
     /// </summary>
-    public class BSharpContext : IdentityDbContext<User>
+    public class BSharpContext : IdentityUserContext<User>
     {
         // This is necessary so the context has a chance to receive 
         // the options from the DI (e.g. the connection string)
@@ -20,7 +20,7 @@ namespace BSharpUnilever.Data
 
         public DbSet<SupportRequest> SupportRequests { get; set; }
 
-        public DbSet<SupportRequestLineItem> SupportResultLineItems { get; set; }
+        public DbSet<SupportRequestLineItem> SupportRequestLineItems { get; set; }
 
         public DbSet<StateChange> StateChanges { get; set; }
 

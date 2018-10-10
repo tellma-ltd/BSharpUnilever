@@ -11,7 +11,12 @@ namespace BSharpUnilever.Data.Entities
     {
         [PersonalData]
         [Required]
+        [MaxLength(255)]
         public string FullName { get; set; }
+
+        [Required]
+        [MaxLength(255)]
+        public string Role { get; set; }
 
         public ICollection<Store> AssignedStores { get; set; }
 
@@ -19,4 +24,5 @@ namespace BSharpUnilever.Data.Entities
 
         public ICollection<SupportRequest> ManagedRequests { get; set; }
     }
+
 }

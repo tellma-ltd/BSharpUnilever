@@ -7,6 +7,6 @@ namespace BSharpUnilever.Services
 {
     public interface IEmailSender
     {
-        Task SendEmail(string destinationEmailAddress, string htmlEmail);
+        Task SendEmail(string destinationEmailAddress, string subject, string htmlEmail);
     }
 }

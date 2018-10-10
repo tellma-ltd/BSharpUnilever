@@ -4,23 +4,22 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BSharpUnilever.Data.Entities
+namespace BSharpUnilever.Controllers.ViewModels
 {
-    public class Store
+    public class StoreVM
     {
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [StringLength(255)]
         public string Name { get; set; }
 
         [Required]
-        public string AccountExecutiveId { get; set; }
-
-        public User AccountExecutive { get; set; }
+        public UserVM AccountExecutive { get; set; }
 
         public bool IsActive { get; set; }
 
-        public ICollection<SupportRequest> SupportRequests { get; set; }
+
+        public List<SupportRequestVM> SupportRequests { get; set; }
     }
 }

@@ -32,6 +32,9 @@ namespace BSharpUnilever.Data.Entities
         public int StoreId { get; set; }
         public Store Store { get; set; }
 
+        [MaxLength(1023)]
+        public string Comment { get; set; }
+
         public ICollection<SupportRequestLineItem> LineItems { get; set; }
 
         public ICollection<StateChange> StateChanges { get; set; }

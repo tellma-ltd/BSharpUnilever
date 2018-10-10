@@ -1,7 +1,10 @@
+using AutoMapper;
+using BSharpUnilever.Controllers.Util;
 using BSharpUnilever.Data;
 using BSharpUnilever.Data.Entities;
 using BSharpUnilever.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,8 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BSharpUnilever
 {
@@ -33,9 +36,6 @@ namespace BSharpUnilever
             // Register identity
             services.AddIdentity<User, IdentityRole>(opt =>
             {
-                // Users will be represented by their confirmed emails
-                opt.User.RequireUniqueEmail = true;
-
                 // Make the password requirement less annoying, and compensate by increasing required length
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireUppercase = false;
@@ -73,7 +73,14 @@ namespace BSharpUnilever
                 opt.UseSqlServer(_config.GetConnectionString("DefaultConnection")));
 
 
-            // TODO determine if AddAuthorization is necessary
+            // Register a handy policy that helps us protect admin endpoints in a friendly and readable way
+            // further reading https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-2.1
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("AdminOnly", policy => policy.Requirements.Add(new IsAdministratorRequirement()));
+            });
+
+            services.AddScoped<IAuthorizationHandler, IsAdministratorHandler>();
 
 
             // Register MVC, the JSON options instruct the serializer to keep property names in PascalCase, 
@@ -89,6 +96,9 @@ namespace BSharpUnilever
                 configuration.RootPath = "ClientApp/dist";
             });
 
+            // AutoMapper
+            services.AddAutoMapper();
+
             // Custom services
             services.AddTransient<BSharpContextSeeder>();
             services.AddSingleton<IEmailSender, SendGridEmailSender>();
@@ -99,7 +109,6 @@ namespace BSharpUnilever
         {
             // Create the admin user who is able to create other users 
             seeder.CreateAdminUserAndRolesAsync().Wait();
-
 
             if (env.IsDevelopment())
             {
@@ -114,7 +123,7 @@ namespace BSharpUnilever
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-            
+
             app.UseAuthentication();
 
             app.UseMvc(routes =>

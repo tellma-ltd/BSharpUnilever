@@ -34,7 +34,7 @@ namespace BSharpUnilever.Data
             // Create the first administrator user who will bootstrap the others
             string adminEmail = "support@banan-it.com";
             string adminFullName = "Banan Support";
-            User adminUser = await CreateUser(adminEmail, adminFullName);
+            User adminUser = await CreateAdminUser(adminEmail, adminFullName);
 
             // If it's development environment, optionally add the developer's personal email from configuration, to help debug email functionality
             if (_env.IsDevelopment())
@@ -44,33 +44,12 @@ namespace BSharpUnilever.Data
 
                 if (devEmail != null && devFullName != null)
                 {
-                    await CreateUser(devEmail, devFullName);
-                }
-            }
-
-            // Create the 4 roles that will be used in this application
-            // We use roles because they enable us to use build in policy
-            // based authorization with ease, further reading: https://docs.microsoft.com/en-us/aspnet/core/security/authorization/roles?view=aspnetcore-2.1
-            await CreateRole("Inactive");
-            await CreateRole("KAE");
-            await CreateRole("Manager");
-
-            string adminRoleName = "Administrator";
-            var adminRole = await CreateRole(adminRoleName);
-
-            // Add admin user in the admin role
-            bool isInAdminRole = await _userManager.IsInRoleAsync(adminUser, adminRoleName);
-            if (!isInAdminRole)
-            {
-                IdentityResult result = await _userManager.AddToRoleAsync(adminUser, adminRoleName);
-                if (!result.Succeeded)
-                {
-                    throw new InvalidOperationException("Could not assign the admin user to the admin role in seeder");
+                    await CreateAdminUser(devEmail, devFullName);
                 }
             }
         }
 
-        private async Task<User> CreateUser(string email, string fullName)
+        private async Task<User> CreateAdminUser(string email, string fullName)
         {
             User user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -80,6 +59,7 @@ namespace BSharpUnilever.Data
                     FullName = fullName,
                     Email = email,
                     UserName = email,
+                    Role = "Administrator",
                     EmailConfirmed = true
                 };
 
