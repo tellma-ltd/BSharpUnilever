@@ -11,7 +11,7 @@ namespace BSharpUnilever.Services
     /// An implementation of IEmailSender that sends the email over the SendGrid service
     /// https://sendgrid.com/. Using this implementation requires that you configure
     /// a SendGrid API key in a configuration provider under "SendGrid:ApiKey", you can 
-    /// get a free key from SendGrid for up to 100 emails per month
+    /// get a free key from SendGrid for up to 100 emails per day
     /// </summary>
     public class SendGridEmailSender : IEmailSender
     {
@@ -51,7 +51,7 @@ namespace BSharpUnilever.Services
             // Handle returned errors
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                // SendGrid has a quota depending on your subscription, on a free account you only get 100 emails per month
+                // SendGrid has a quota depending on your subscription, on a free account you only get 100 emails per day
                 throw new InvalidOperationException("The SendGrid subscription configured in the system has reached its limit, please contact support");
             }
 

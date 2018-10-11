@@ -51,7 +51,7 @@ namespace BSharpUnilever.Controllers
         {
             try
             {
-                // First project the model to the view model using AutoMapper
+                // First get a readonly query
                 IQueryable<User> query = _context.Users.AsNoTracking();
 
                 // Apply the searching
@@ -156,21 +156,13 @@ namespace BSharpUnilever.Controllers
                     uri = QueryHelpers.AddQueryString(uri, "userId", user.Id);
                     uri = QueryHelpers.AddQueryString(uri, "emailConfirmationToken", emailConfirmationToken);
                     uri = QueryHelpers.AddQueryString(uri, "passwordResetToken", passwordResetToken);
-                    var htmlUri = HtmlEncoder.Default.Encode(uri);
                     string currentUser = User.UserName();
 
-                    // Prepare the email template (in a larger app you would probably store such templates in files)
-                    string htmlEmail = Util.Util.TranscludeInBSharpEmailTemplate(
-                                      $@"<p>
-                                        <br /> 
-                                        {currentUser} has invited you to join! Let's start by confirming your email:
-                                        <br />
-                                        <br />
-                                        <br />
-                                        <a href=""{htmlUri}"" style=""background-color:#17a2b8;padding:20px;text-decoration:none;color:#fff"">
-                                            Confirm My Email
-                                        </a>
-                                    </p>");
+                    // Prepare the email content
+                    string htmlEmail = Util.Util.BSharpEmailTemplate(
+                        message: $"{currentUser} is inviting you to join! Let's start by confirming your email:",
+                        hrefToAction: uri, 
+                        hrefLabel: "Confirm My Email");
 
                     // Send the email using injected sender
                     await _emailSender.SendEmail(
@@ -191,6 +183,12 @@ namespace BSharpUnilever.Controllers
                     if (user == null)
                     {
                         return NotFound($"Could not find a user with an Id of '{model.Id}'");
+                    }
+
+                    // Here we ensure that there is at least one administrator in the system at all times
+                    if(model.Email == User.UserName() && model.Role != Roles.Administrator)
+                    {
+                        return BadRequest("You cannot remove the administrator role from yourself");
                     }
 
                     // Update the updatable properties and ignore the rest

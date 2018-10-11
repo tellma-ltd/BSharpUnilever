@@ -1,9 +1,8 @@
 ﻿using BSharpUnilever.Controllers.Util;
+using BSharpUnilever.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BSharpUnilever.Controllers.ViewModels
 {
@@ -15,21 +14,22 @@ namespace BSharpUnilever.Controllers.ViewModels
 
         public int SerialNumber { get; set; }
 
-        [ChoiceList(0, 10, 20, 100, -1, -10)]
-        public int State { get; set; } // Draft (0), Submitted (10), Approved (20), Posted (100), Rejected (-1), Canceled (-10)
+        [ChoiceList(
+            SupportRequestStates.Draft, SupportRequestStates.Submitted, SupportRequestStates.Approved,
+            SupportRequestStates.Posted, SupportRequestStates.Canceled, SupportRequestStates.Rejected)]
+        public string State { get; set; }
 
-        public string AccountExecutiveId { get; set; }
+        [Required]
         public UserVM AccountExecutive { get; set; }
 
         [Required]
-        public string ManagerId { get; set; }
         public UserVM Manager { get; set; }
 
         [Required]
-        [ChoiceList("DC", "PS", "PR", "FB")]
-        public string Reason { get; set; } // Display Contract (DC), Premium Support (PS), Price Reduction (PR), From Balance (FB)
+        [ChoiceList(Reasons.DisplayContract, Reasons.PremiumSupport, Reasons.PriceReduction, Reasons.FromBalance)]
+        public string Reason { get; set; }
 
-        public int StoreId { get; set; }
+        [Required]
         public StoreVM Store { get; set; }
 
         [StringLength(1023)]
@@ -55,7 +55,6 @@ namespace BSharpUnilever.Controllers.ViewModels
     {
         public int Id { get; set; }
 
-        public int? ProductId { get; set; }
         public ProductVM Product { get; set; }
 
         public decimal Quantity { get; set; }
@@ -81,7 +80,7 @@ namespace BSharpUnilever.Controllers.ViewModels
 
         public int FromState { get; set; } // Same states as SupportRequest
 
-        public int ToState { get; set; }// Same states as SupportRequest
+        public int ToState { get; set; } // Same states as SupportRequest
 
         public DateTimeOffset Time { get; set; }
 

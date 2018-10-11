@@ -39,7 +39,7 @@ namespace BSharpUnilever.Controllers
         {
             try
             {
-                // First project the model to the view model using AutoMapper
+                // First get a readonly query
                 IQueryable<Store> query = _context.Stores.AsNoTracking();
 
                 // Apply the searching
@@ -90,7 +90,7 @@ namespace BSharpUnilever.Controllers
         {
             try
             {
-                // Retrieve the user and if missing return a 404
+                // Retrieve the record and if missing return a 404
                 var result = await InternalGetAsync(id);
                 if (result == null)
                 {
@@ -99,10 +99,6 @@ namespace BSharpUnilever.Controllers
 
                 // All is good
                 return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
@@ -114,12 +110,12 @@ namespace BSharpUnilever.Controllers
         // This method is reused in both Get(id) and Post(), DRY principal applied
         private async Task<StoreVM> InternalGetAsync(int id)
         {
-            // Retrieve the user and if missing return a 404
+            // Retrieve the record
             Store record = await _context.Stores.AsNoTracking()
                 .Include(e => e.AccountExecutive)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-            // All is good
+            // Transform and return
             return _mapper.Map<Store, StoreVM>(record);
         }
 

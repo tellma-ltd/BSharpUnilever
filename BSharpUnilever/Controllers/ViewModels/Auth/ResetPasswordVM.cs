@@ -16,6 +16,5 @@ namespace BSharpUnilever.Controllers.ViewModels.Auth
 
         [Required]
         public string NewPassword { get; set; }
-
     }
 }

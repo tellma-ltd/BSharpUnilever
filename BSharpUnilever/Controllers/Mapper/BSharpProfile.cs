@@ -36,24 +36,15 @@ namespace BSharpUnilever.Controllers.Mapper
                 // Navigation collections
                 .ForMember(e => e.LineItems, opt => opt.Ignore())
                 .ForMember(e => e.StateChanges, opt => opt.Ignore())
-                .ForMember(e => e.GeneratedDocuments, opt => opt.Ignore())
-
-                // Readonly properties
-                .ForMember(e => e.Id, opt => opt.Ignore())
-                .ForMember(e => e.CreatedBy, opt => opt.Ignore())
-                .ForMember(e => e.Created, opt => opt.Ignore())
-                .ForMember(e => e.ModifiedBy, opt => opt.Ignore())
-                .ForMember(e => e.Modified, opt => opt.Ignore())
-                .ForMember(e => e.Date, opt => opt.Ignore())
-                .ForMember(e => e.SerialNumber, opt => opt.Ignore());
+                .ForMember(e => e.GeneratedDocuments, opt => opt.Ignore());
 
             CreateMap<SupportRequestLineItem, SupportRequestLineItemVM>();
             CreateMap<SupportRequestLineItemVM, SupportRequestLineItem>()
                 .ForMember(e => e.Product, opt => opt.Ignore())
                 .ForMember(e => e.ProductId, opt => opt.MapFrom(e => e.Product == null ? (int?)null : e.Product.Id));
 
-            // Note: Using the mapper profile like that to handle navigation properties and read only properties
-            // is fine for this small project, but we have a more robust technique in mind for projets of larger scale
+            // Note: Using the mapper profile like that to handle navigation properties is fine for this
+            // small project, but we have a more robust technique in mind for projects of a larger scale
         }
     }
 }

@@ -13,6 +13,5 @@ namespace BSharpUnilever.Controllers.ViewModels.Auth
 
         [Required]
         public string EmailConfirmationToken { get; set; }
-
     }
 }

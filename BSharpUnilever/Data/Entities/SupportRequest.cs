@@ -17,8 +17,9 @@ namespace BSharpUnilever.Data.Entities
 
         public int SerialNumber { get; set; }
 
-        public int State { get; set; } // Draft (0), Submitted (10), Approved (20), Posted (100), Rejected (-1), Canceled (-10)
+        public string State { get; set; }
 
+        [Required]
         public string AccountExecutiveId { get; set; }
         public User AccountExecutive { get; set; }
 
@@ -27,7 +28,7 @@ namespace BSharpUnilever.Data.Entities
         public User Manager { get; set; }
 
         [Required]
-        public string Reason { get; set; } // Display Contract (DC), Premium Support (PS), Price Reduction (PR)
+        public string Reason { get; set; }
 
         public int StoreId { get; set; }
         public Store Store { get; set; }
@@ -48,6 +49,26 @@ namespace BSharpUnilever.Data.Entities
         public string ModifiedBy { get; set; }
 
         public DateTimeOffset Modified { get; set; }
+    }
+
+    // These act like an in memory table
+    public static class SupportRequestStates
+    {
+        public const string Draft = "Draft";
+        public const string Submitted = "Submitted";
+        public const string Approved = "Approved";
+        public const string Posted = "Posted";
+        public const string Canceled = "Canceled";
+        public const string Rejected = "Rejected";
+    }
+
+    // These act like an in memory table
+    public static class Reasons
+    {
+        public const string DisplayContract = "DC";
+        public const string PremiumSupport = "PS";
+        public const string PriceReduction = "PR";
+        public const string FromBalance = "FB";
     }
 
     // This is a weak entity, so we leave it in the same file as its parent
@@ -95,7 +116,7 @@ namespace BSharpUnilever.Data.Entities
 
         public int FromState { get; set; } // Same states as SupportRequest
 
-        public int ToState { get; set; }// Same states as SupportRequest
+        public int ToState { get; set; } // Same states as SupportRequest
 
         public DateTimeOffset Time { get; set; }
 

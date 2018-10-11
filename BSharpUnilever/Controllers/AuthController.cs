@@ -175,20 +175,12 @@ namespace BSharpUnilever.Controllers
                 string uri = Url.Content("~/forgot-password");
                 uri = QueryHelpers.AddQueryString(uri, "userId", user.Id);
                 uri = QueryHelpers.AddQueryString(uri, "passwordResetToken", passwordResetToken);
-                var htmlUri = HtmlEncoder.Default.Encode(uri);
 
-                // Prepare the email template (in a larger app you would probably store such templates in files)
-                string htmlEmail = Util.Util.TranscludeInBSharpEmailTemplate(
-                                  $@"<p>
-                                        <br /> 
-                                        To reset your password please click below
-                                        <br />
-                                        <br />
-                                        <br />
-                                        <a href=""{htmlUri}"" style=""background-color:#17a2b8;padding:20px;text-decoration:none;color:#fff"">
-                                            Reset My Password
-                                        </a>
-                                    </p>");
+                // Prepare the email content
+                string htmlEmail = Util.Util.BSharpEmailTemplate(
+                    message: "To reset your password please click below", 
+                    hrefToAction: uri, 
+                    hrefLabel: "Reset My Password");
 
                 // Send the email using injected sender
                 await _emailSender.SendEmail(
