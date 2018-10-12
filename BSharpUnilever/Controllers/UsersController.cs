@@ -43,11 +43,9 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<UserVM>> GetAll(int top = DEFAULT_PAGE_SIZE,
-                                                        int skip = 0,
+        public ActionResult<IEnumerable<UserVM>> GetAll(int top = DEFAULT_PAGE_SIZE, int skip = 0,
                                                         string orderby = nameof(UserVM.FullName),
-                                                        bool desc = false,
-                                                        string search = null)
+                                                        bool desc = false, string search = null)
         {
             try
             {
@@ -245,6 +243,35 @@ namespace BSharpUnilever.Controllers
             {
                 _logger.LogError(ex.StackTrace);
                 return BadRequest(ex);
+            }
+        }
+
+
+        [HttpGet("current")]
+        public async Task<ActionResult<UserVM>> GetCurrent()
+        {
+            // This method is useful for retrieving the current user when the client launches,
+            // the returned object has useful information such as the full name and the role
+            // which the client can use to modify the UI accordingly
+            try
+            {
+                // Retrieve the user and if missing return a 404
+                var currentUserName = User.UserName();
+                User user = await _userManager.FindByNameAsync(currentUserName);
+                if (user == null)
+                {
+                    // This is only possible if the associated user object was deleted 
+                    // after the person logged-in
+                    return NotFound($"Could not find the current user");
+                }
+
+                // All is good
+                return Ok(_mapper.Map<User, UserVM>(user));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                return BadRequest(ex.Message);
             }
         }
     }

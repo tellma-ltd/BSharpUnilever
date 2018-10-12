@@ -4,6 +4,9 @@ using BSharpUnilever.Controllers.ViewModels;
 using BSharpUnilever.Data;
 using BSharpUnilever.Data.Entities;
 using BSharpUnilever.Services;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -139,6 +143,43 @@ namespace BSharpUnilever.Controllers
             }
         }
 
+        [HttpGet("generateddocuments/{id}")]
+        public async Task<ActionResult> GetGeneratedDocument(int id)
+        {
+            // Get the document
+            var creditNote = await _context.GeneratedDocuments
+                .Include(e => e.SupportRequest.LineItems)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            // Make sure it exists and that it isn't void
+            if (creditNote == null)
+            {
+                return NotFound($"Could not find the document with Id={id}");
+            }
+            else if (creditNote.State < 0) // 0 == Void
+            {
+                return BadRequest($"This credit note has been voided");
+            }
+            else
+            {
+                using (MemoryStream resultStream = new MemoryStream())
+                {
+                    PdfWriter writer = new PdfWriter(resultStream);
+                    PdfDocument pdf = new PdfDocument(writer);
+                    Document document = new Document(pdf);
+                    document.Add(new Paragraph($"Unilever Document Number: {creditNote.SupportRequest.SerialNumber:D5}"));
+                    document.Add(new Paragraph($"Credit Note Number: {creditNote.SerialNumber:D2}"));
+                    document.Add(new Paragraph($"Store Name: {creditNote.SupportRequest.Store.Name}"));
+                    document.Add(new Paragraph($"Date: {creditNote.Date}"));
+                    document.Add(new Paragraph($"This credit note is to confirm a credit amount of {creditNote.SupportRequest.LineItems.Sum(e => e.UsedValue):N2} AED")); // AED is hardcoded throughout the app
+                    document.Add(new Paragraph($"Note: This file can be made more pretty"));
+                    document.Close();
+
+                    return File(resultStream.ToArray(), "application/pdf", $"CrNote_SR{creditNote.SupportRequest.SerialNumber:D5}.pdf");
+                }
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<SupportRequestVM>> Post(SupportRequestVM model)
         {
@@ -158,7 +199,7 @@ namespace BSharpUnilever.Controllers
 
                 // If the validation returned errors, return a 400
                 if (errors.Any())
-                    return BadRequest("The following validation errors were found:\n" + string.Join("\n - ", errors));
+                    return BadRequest("The following validation errors were found:\n - " + string.Join("\n - ", errors));
 
                 if (model.Id == 0) // Insert logic
                 {
@@ -232,8 +273,11 @@ namespace BSharpUnilever.Controllers
                         }
                     }
 
+
                     // Save the changes
                     await _context.SaveChangesAsync();
+
+
 
                     // Finally return the same result you would get with a GET request
                     var resultModel = await InternalGetAsync(model.Id);
@@ -325,10 +369,22 @@ namespace BSharpUnilever.Controllers
                 else
                 {
                     var modelLine = model.LineItems.Single();
+                    modelLine.Product = null;
                     modelLine.Quantity = 0;
                     modelLine.RequestedSupport = 0;
                     modelLine.ApprovedSupport = 0;
                     modelLine.UsedSupport = 0;
+                }
+            }
+
+            // KAE cannot exceed the approved amount in the request unless it's from balance
+            if (model.Reason != Reasons.FromBalance)
+            {
+                var violations = model.LineItems.Where(e => e.UsedValue > e.ApprovedValue);
+                if (violations.Count() > 0)
+                {
+                    var violation = violations.First();
+                    errors.Add($"The used support {violation.UsedValue:N2} cannot be more than the approved support {violation.ApprovedValue:N2}");
                 }
             }
 
@@ -368,6 +424,13 @@ namespace BSharpUnilever.Controllers
             newModel.ModifiedBy = currentUser.UserName;
             newModel.Modified = DateTimeOffset.Now;
 
+            // One way of handling readonly properties
+            newModel.CreatedBy = oldModel.CreatedBy;
+            newModel.Created = oldModel.Created;
+            newModel.SerialNumber = oldModel.SerialNumber;
+            newModel.Date = oldModel.Date;
+
+
             // The list of non-transactional actions to be executed at the end
             List<Func<Task>> deferredActions = new List<Func<Task>>();
 
@@ -384,7 +447,7 @@ namespace BSharpUnilever.Controllers
             if (!permissibleStates.Contains(originalState) && !permissibleStates.Contains(newState))
             {
                 // Cannot add or remove lines
-                if (oldLines.Keys.ToHashSet().SetEquals(newModel.LineItems.Select(e => e.Id)))
+                if (!oldLines.Keys.ToHashSet().SetEquals(newModel.LineItems.Select(e => e.Id)))
                 {
                     throw new InvalidOperationException($"Lines cannot be added or removed after state {SupportRequestStates.Draft}");
                 }
@@ -589,14 +652,22 @@ namespace BSharpUnilever.Controllers
                 {
                     CheckUser(currentUser, newModel.AccountExecutive);
 
-                    // Generate a credit note
-                    // oldModel.GeneratedDocuments.Add(new GeneratedDocumentVM { });
+                    // Generate a new credit note
+                    int maxSerial = oldModel.GeneratedDocuments.Max(e => (int?)e.SerialNumber) ?? 0;
+                    _context.GeneratedDocuments.Add(new GeneratedDocument
+                    {
+                        SerialNumber = maxSerial + 1,
+                        SupportRequestId = newModel.Id,
+                        Date = DateTime.Today, // This may result in minor time zone issues, since the users aren't in UTC zone
+                    });
                 }
                 else if (originalState == SupportRequestStates.Posted && newState == SupportRequestStates.Approved)
                 {
                     CheckUser(currentUser, newModel.AccountExecutive);
 
-                    // Void existing credit note
+                    // Void existing credit notes
+                    var existingDocuments = _context.GeneratedDocuments.Where(e => e.SupportRequestId == newModel.Id).ToList();
+                    existingDocuments.ForEach(e => e.State = -1);
                 }
 
 
@@ -604,15 +675,35 @@ namespace BSharpUnilever.Controllers
                 {
                     CheckRoles(currentUser, Roles.KAE);
 
-                    // Make sure has sufficient balance
+                    if (newModel.Reason != Reasons.FromBalance)
+                    {
+                        throw new InvalidOperationException(
+                            "To post the document without approval the support reason must be specified as 'From Balance'");
+                    }
+                    else
+                    {
+                        // Make sure has sufficient balance
+                        var balance = CurrentAvailableBalance(currentUser);
+                        if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
+                            throw new InvalidOperationException("");
+                    }
 
-                    // Generate a credit note
+                    // Generate a new credit note
+                    int maxSerial = oldModel.GeneratedDocuments.Max(e => (int?)e.SerialNumber) ?? 0;
+                    _context.GeneratedDocuments.Add(new GeneratedDocument
+                    {
+                        SerialNumber = maxSerial + 1,
+                        SupportRequestId = newModel.Id,
+                        Date = DateTime.Today, // This may result in minor time zone issues, since the users aren't in UTC zone
+                    });
                 }
                 else if (originalState == SupportRequestStates.Posted && newState == SupportRequestStates.Draft)
                 {
                     CheckUser(currentUser, newModel.AccountExecutive);
 
-                    // Void existing credit note
+                    // Void existing credit notes
+                    var existingDocuments = _context.GeneratedDocuments.Where(e => e.SupportRequestId == newModel.Id).ToList();
+                    existingDocuments.ForEach(e => e.State = -1);
                 }
 
                 else if (originalState == SupportRequestStates.Draft && newState == SupportRequestStates.Approved)
@@ -636,7 +727,6 @@ namespace BSharpUnilever.Controllers
                         recipientEmail: newModel.AccountExecutive.Email,
                         subject: $"{currentUser.FullName} has approved a support amount for you",
                         message: $"{currentUser.FullName} has approved a support amount for you");
-
                 }
                 else if (originalState == SupportRequestStates.Approved && newState == SupportRequestStates.Draft)
                 {
@@ -648,7 +738,6 @@ namespace BSharpUnilever.Controllers
                         recipientEmail: newModel.AccountExecutive.Email,
                         subject: $"{currentUser.FullName} has returned your support amount",
                         message: $"{currentUser.FullName} has returned the support amount");
-
                 }
                 else
                 {
@@ -661,13 +750,25 @@ namespace BSharpUnilever.Controllers
             return Task.FromResult(deferredActions);
         }
 
+        private decimal CurrentAvailableBalance(User user)
+        {
+            // The current available balance of the KAE is all the approved value 
+            // minus the used value of all posted request line items
+            var postedLines = from e in _context.SupportRequestLineItems
+                              where e.SupportRequest.AccountExecutive.UserName == user.UserName &&
+                              e.SupportRequest.State == SupportRequestStates.Posted
+                              select e;
+
+            return postedLines.Sum(e => (decimal?)(e.ApprovedValue - e.UsedValue)) ?? 0m;
+        }
+
         private void PushSendEmail(List<Func<Task>> deferredActions, int requestId, string recipientEmail, string subject, string message)
         {
             deferredActions.Add(async () =>
             {
                 // In a bigger app, the API should not know where the SPA lives
                 // But this is fine and convenient for now
-                string url = $"https://{Request.Host}/{Request.PathBase}/support-requests/{requestId}";
+                string url = $"https://{Request.Host}/{Request.PathBase}support-requests/{requestId}";
 
                 // Prepare the email content
                 string htmlEmailContent = Util.Util.BSharpEmailTemplate(

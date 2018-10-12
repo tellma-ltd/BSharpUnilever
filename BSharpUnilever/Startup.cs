@@ -1,5 +1,4 @@
 using AutoMapper;
-using BSharpUnilever.Controllers.Util;
 using BSharpUnilever.Data;
 using BSharpUnilever.Data.Entities;
 using BSharpUnilever.Services;
@@ -14,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BSharpUnilever
 {
@@ -87,7 +86,14 @@ namespace BSharpUnilever
             // even though this isn't convention, it makes a few things easier since both client and server
             // side sides get to see and communicate identical property names, for example 'api/customers?orderby='Name'
             services.AddMvc()
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver { NamingStrategy = new DefaultNamingStrategy() })
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new DefaultNamingStrategy()
+                    };
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // In production, the Angular files will be served from this directory

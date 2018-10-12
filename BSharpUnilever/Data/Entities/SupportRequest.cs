@@ -137,5 +137,7 @@ namespace BSharpUnilever.Data.Entities
         public int SerialNumber { get; set; }
 
         public int State { get; set; } // Valid (0), Void (-1)
+
+        public DateTime Date { get; set; }
     }
 }

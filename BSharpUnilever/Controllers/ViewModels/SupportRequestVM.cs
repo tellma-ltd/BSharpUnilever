@@ -10,9 +10,9 @@ namespace BSharpUnilever.Controllers.ViewModels
     {
         public int Id { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
-        public int SerialNumber { get; set; }
+        public int? SerialNumber { get; set; }
 
         [ChoiceList(
             SupportRequestStates.Draft, SupportRequestStates.Submitted, SupportRequestStates.Approved,
@@ -97,5 +97,7 @@ namespace BSharpUnilever.Controllers.ViewModels
         public int SerialNumber { get; set; }
 
         public int State { get; set; } // Valid (0), Void (-1)
+
+        public DateTime Date { get; set; }
     }
 }

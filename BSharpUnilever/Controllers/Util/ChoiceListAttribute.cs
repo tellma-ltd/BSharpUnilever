@@ -22,7 +22,7 @@ namespace BSharpUnilever.Controllers.Util
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             // If it doesn't match any of the choices => error
-            if (!_choices.Contains(value))
+            if (value != null && !_choices.Contains(value))
             {
                 string concatenatedChoices = string.Join(", ", _choices.Select(e => e.ToString()));
                 return new ValidationResult($"Only the following values are allowed: {concatenatedChoices}");

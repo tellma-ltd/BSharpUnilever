@@ -18,8 +18,5 @@ namespace BSharpUnilever.Controllers.ViewModels
         public UserVM AccountExecutive { get; set; }
 
         public bool IsActive { get; set; }
-
-
-        public List<SupportRequestVM> SupportRequests { get; set; }
     }
 }
