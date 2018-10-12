@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+
+///////////////////////////////// Bootstrap 4 /////////////////////////////////
+
+// Customize Bootstrap by overriding its default variables
+$primary: #17a2b8; // Classy cyan
+$info: #007bff; // Bright blue
+$enable-rounded: false; // Square corners
+$font-size-base: 0.9rem; // The default font (1rem) is too big
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+// Remove any other round corners
+.modal-content, .dropdown-menu {
+  border-radius: 0;
+}
+
+// Change the striped 
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+// This solves a problem in responsive tables that contain dropdowns
+@media (max-width: 767px) {
+  .table-responsive .dropdown-menu {
+    position: static !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .table-responsive {
+    overflow: visible;
+  }
+}
+
+
+///////////////////////////////// BSharp /////////////////////////////////
