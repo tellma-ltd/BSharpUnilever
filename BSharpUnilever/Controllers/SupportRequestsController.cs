@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -177,6 +178,105 @@ namespace BSharpUnilever.Controllers
 
                     return File(resultStream.ToArray(), "application/pdf", $"CrNote_SR{creditNote.SupportRequest.SerialNumber:D5}.pdf");
                 }
+            }
+        }
+
+
+        [HttpGet("data")]
+        [AllowAnonymous]
+        public async Task<ActionResult> GetData()
+        {
+            // This API returns all support requests in one big Excel file, leaving it
+            // The manager downloads this file and generates all the reports s/he needs
+            try
+            {
+                // Retrieve the requests while preserving security
+                var username = User.UserName();
+                var currentUser = await _userManager.FindByNameAsync(username);
+
+                var requests = (await ApplyRowLevelSecurityAsync(_context.SupportRequests, currentUser))
+                        .Include(e => e.AccountExecutive)
+                        .Include(e => e.Manager)
+                        .Include(e => e.Store)
+                        .Include(e => e.LineItems)
+                        .ThenInclude(e => e.Product)
+                        .ToList();
+
+                var requestLines = requests.SelectMany(e => e.LineItems);
+
+                // The function below relies on the popular EPPlus library for Excel manipulation
+                // This library is licensed under LGPL
+                using (var memStream = new MemoryStream())
+                {
+                    using (var p = new ExcelPackage(memStream))
+                    {
+                        var cells = p.Workbook.Worksheets.Add("Support Requests").Cells;
+                        int row = 1;
+                        int col = 1;
+                        var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c.ToString()).ToArray();
+
+                        /////// Set all the header labels and the column styles
+                        cells[cols[col] + row].Value = "Date";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "yyyy-mm-dd";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Serial Number";
+                        col++;
+
+                        cells[cols[col] + row].Value = "State";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Store";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Value";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "#,##0.00";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        col++;
+
+                        /////// Populate the data
+                        foreach (var line in requestLines)
+                        {
+                            // reset the column and increment the row
+                            col =  1;
+                            row++;
+
+                            // Date
+                            cells[cols[col++] + row].Value = line.SupportRequest.Date;
+
+                            // Serial Number
+                            cells[cols[col++] + row].Value = "SR" + line.SupportRequest.SerialNumber.ToString("D5");
+
+                            // State
+                            cells[cols[col++] + row].Value = line.SupportRequest.State;
+
+                            // Store
+                            cells[cols[col++] + row].Value = line.SupportRequest.Store?.Name;
+
+                            // Value
+                            cells[cols[col++] + row].Value = line.UsedValue;
+                        }
+
+                        // Set the header style
+                        if (col > 1)
+                        {
+                            string headerRange = $"{cols[1]}1:{cols[col - 1]}1";
+                            cells[headerRange].Style.Font.Bold = true;
+                            cells[headerRange].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Medium;
+                        }
+
+                        // Save the Excel to the memory stream and return it
+                        p.Save();
+                        return File(fileContents: memStream.ToArray(),
+                            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileDownloadName: $"SupportRequests_{DateTime.Today:d}.xlsx");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -844,10 +944,5 @@ namespace BSharpUnilever.Controllers
 
             return _mapper.Map<SupportRequest, SupportRequestVM>(record);
         }
-    }
-
-    public class ValidationError
-    {
-        public string Message { get; set; }
     }
 }
