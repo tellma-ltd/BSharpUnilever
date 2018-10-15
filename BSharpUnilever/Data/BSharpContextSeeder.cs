@@ -72,23 +72,5 @@ namespace BSharpUnilever.Data
 
             return user;
         }
-
-        // Helper method for creating roles
-        private async Task<IdentityRole> CreateRole(string roleName)
-        {
-            IdentityRole role = await _roleManager.FindByNameAsync(roleName);
-            if (role == null)
-            {
-                role = new IdentityRole(roleName);
-
-                IdentityResult result = await _roleManager.CreateAsync(role);
-                if (!result.Succeeded)
-                {
-                    throw new InvalidOperationException($"Could not create role {roleName} in seeder");
-                }
-            }
-
-            return role;
-        }
     }
 }

@@ -78,13 +78,12 @@ namespace BSharpUnilever.Controllers.ViewModels
     {
         public int Id { get; set; }
 
-        public int FromState { get; set; } // Same states as SupportRequest
+        public string FromState { get; set; } // Same states as SupportRequest
 
-        public int ToState { get; set; } // Same states as SupportRequest
+        public string ToState { get; set; } // Same states as SupportRequest
 
         public DateTimeOffset Time { get; set; }
 
-        public string UserId { get; set; }
         public UserVM User { get; set; }
     }
 

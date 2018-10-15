@@ -6,4 +6,11 @@ var Product = /** @class */ (function () {
     return Product;
 }());
 exports.Product = Product;
+var choicesProductType = {
+    "HC": 'Home Care',
+    "PC": 'Personal Care',
+    "F&R": 'Food & Refreshments',
+    "O": 'Other',
+};
+exports.choicesProductType = choicesProductType;
 //# sourceMappingURL=Product.js.map

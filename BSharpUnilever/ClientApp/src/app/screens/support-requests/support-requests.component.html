@@ -1,3 +1,43 @@
-<p>
-  support-requests works!
-</p>
+<b-master controller="supportrequests"
+          [tileTemplate]="tile"
+          [tableDefinition]="[
+              { display: 'Serial No.', orderBy: 'SerialNumber' },
+              { display: 'Date', orderBy: 'Date' },
+              { display: 'State', orderBy: 'State' },
+              { display: 'Store' },
+              { display: 'Key Account Executive' },
+              { display: 'Manager' },
+              { display: 'Reason', orderBy: 'Reason' },
+              { display: 'Requested (AED)' }
+            ]"
+          [tableRowTemplate]="row">
+
+</b-master>
+
+<ng-template #tile let-model="model">
+  <div class="d-flex justify-content-between">
+    <span class="d-block text-truncate">{{ model.SerialNumber | bSerial:'JE'}}</span>
+    <span>{{ requestedValue(model) | number:'1.2-2' }}</span>
+  </div>
+  <div class="d-flex justify-content-between mt-1 small">
+    <span>{{model.Date | date }}</span>
+    <span class="text-white bg-danger pl-1 pr-1">{{ model.State }}</span>
+    <ng-container *ngTemplateOutlet="stateTemplate"></ng-container>
+  </div>
+</ng-template>
+
+<ng-template #row let-model="model">
+  <td>{{ model.SerialNumber | bSerial:'JE'}}</td>
+  <td>{{ model.Date | date }}</td>
+  <td><ng-container *ngTemplateOutlet="stateTemplate"></ng-container></td>
+  <td>{{ model.Store?.Name }}</td>
+  <td>{{ model.AccountExecutive?.FullName }}</td>
+  <td>{{ model.Manager?.FullName }}</td>
+  <td>{{ getReasonDisplay(model.Reason) }}</td>
+  <td class="text-right">{{ requestedValue(model) }}</td>
+</ng-template>
+
+
+<ng-template #stateTemplate>
+  <span class="text-white bg-danger pl-1 pr-1">{{ model.State }}</span>
+</ng-template>

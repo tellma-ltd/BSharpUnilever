@@ -1,3 +1,21 @@
-<p>
-  stores works!
-</p>
+<b-master controller="stores"
+          [tileTemplate]="tile"
+          [tableDefinition]="[
+              { display: 'Name', orderBy: 'Name' },
+              { display: 'Key Account Executive' } ,
+              { display: 'Is Active', orderBy: 'IsActive' }
+            ]"
+          [tableRowTemplate]="row">
+
+</b-master>
+
+<ng-template #tile let-model="model">
+  <span class="d-block text-truncate">{{model.Name}}</span>
+  <span class="small">{{model.AccountExecutive?.FullName}}</span>
+</ng-template>
+
+<ng-template #row let-model="model">
+  <td>{{ model.Name }}</td>
+  <td>{{ model.AccountExecutive?.FullName }}</td>
+  <td>{{ model.IsActive ? 'Yes' : 'No' }}</td>
+</ng-template>

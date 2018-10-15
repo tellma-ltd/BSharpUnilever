@@ -1,15 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { choicesProductType } from '../../data/entities/Product';
 
 @Component({
   selector: 'b-products',
   templateUrl: './products.component.html',
   styles: []
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent {
 
-  constructor() { }
-
-  ngOnInit() {
+  getDisplay(key: string): string {
+    return choicesProductType[key];
   }
-
 }

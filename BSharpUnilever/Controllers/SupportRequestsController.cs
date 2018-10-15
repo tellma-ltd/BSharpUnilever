@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace BSharpUnilever.Controllers
 {
@@ -99,6 +100,7 @@ namespace BSharpUnilever.Controllers
                     .Include(e => e.AccountExecutive)
                     .Include(e => e.Manager)
                     .Include(e => e.Store)
+                    .Include(e => e.LineItems)
                     .ToListAsync();
 
                 var resultData = _mapper.Map<List<SupportRequest>, List<SupportRequestVM>>(memoryList);
@@ -238,7 +240,7 @@ namespace BSharpUnilever.Controllers
                         foreach (var line in requestLines)
                         {
                             // reset the column and increment the row
-                            col =  1;
+                            col = 1;
                             row++;
 
                             // Date
@@ -335,7 +337,7 @@ namespace BSharpUnilever.Controllers
                     var originalModel = _mapper.Map<SupportRequest, SupportRequestVM>(dbRecord);
 
                     // updating logic
-                    await UpdatingAsync(model, originalModel, user);
+                    var deferredActions = await UpdatingAsync(model, originalModel, user);
 
                     // Update the header
                     _mapper.Map(model, dbRecord);
@@ -373,11 +375,19 @@ namespace BSharpUnilever.Controllers
                         }
                     }
 
+                    using (var scope = new TransactionScope())
+                    {
+                        // Save the changes
+                        await _context.SaveChangesAsync();
 
-                    // Save the changes
-                    await _context.SaveChangesAsync();
+                        // Carry out the deferred actions 
+                        foreach (var deferredAction in deferredActions)
+                        {
+                            await deferredAction();
+                        }
 
-
+                        scope.Complete();
+                    }
 
                     // Finally return the same result you would get with a GET request
                     var resultModel = await InternalGetAsync(model.Id);
@@ -645,8 +655,20 @@ namespace BSharpUnilever.Controllers
             #region State update logic
 
             // State change logic
-            if (originalState != newState) // State change logic below
+            if (originalState != newState)
             {
+                // Add a state change record
+                _context.StateChanges.Add(new StateChange
+                {
+                    SupportRequestId = newModel.Id,
+                    Time = DateTimeOffset.Now,
+                    FromState = originalState,
+                    ToState = newState,
+                    UserId = currentUser.Id,
+                    UserRole = currentUser.Role
+                });
+
+                // State change logic below
                 if (originalState == SupportRequestStates.Draft && newState == SupportRequestStates.Submitted)
                 {
                     // (1) Check roles
@@ -900,17 +922,16 @@ namespace BSharpUnilever.Controllers
             }
         }
 
-        // Helper method
         private async Task<User> GetCurrentUserAsync()
         {
-            // The requirement is that Key account executives can only see their own requests
+            // Helper method
             string userName = User.UserName();
             return await _userManager.FindByNameAsync(userName);
         }
 
-        // Helper Method
         private async Task<IQueryable<SupportRequest>> ApplyRowLevelSecurityAsync(IQueryable<SupportRequest> query, User user = null)
         {
+            // The requirement is that Key account executives can only see their own requests
             if (user == null)
                 user = await GetCurrentUserAsync();
 

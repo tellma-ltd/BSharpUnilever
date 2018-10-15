@@ -43,6 +43,7 @@ import {
   faExclamationTriangle,
   faSpinner,
   faSignInAlt,
+  faSignOutAlt,
   faKey,
   faCheck,
   faPlus,
@@ -52,10 +53,12 @@ import {
   faAngleRight,  faThLarge,
   faList
 } from '@fortawesome/free-solid-svg-icons';
+import { GlobalsResolverService } from './data/globals-resolver.service';
+import { SerialPipe } from './misc/serial.pipe';
 
 // Icons to be used in the app
 library.add(
-  faExclamationTriangle, faSpinner, faSignInAlt,
+  faExclamationTriangle, faSpinner, faSignInAlt, faSignOutAlt,
   faKey, faCheck, faPlus, faSyncAlt, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faThLarge, faList);
 
@@ -72,6 +75,7 @@ const routes: Routes = [
     component: ShellComponent,
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
+    resolve: { globals: GlobalsResolverService },
     children: [
       { path: 'users', component: UsersComponent },
       { path: 'users/:id', component: UserDetailsComponent },
@@ -118,7 +122,8 @@ const routes: Routes = [
     DetailsPickerComponent,
     ErrorMessageComponent,
     SuccessMessageComponent,
-    ResetPasswordControlComponent
+    ResetPasswordControlComponent,
+    SerialPipe
   ],
   imports: [
     BrowserModule,
@@ -126,16 +131,18 @@ const routes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(routes),
     FontAwesomeModule,
-    NgbDropdownModule,
+    NgbDropdownModule.forRoot(),
     NgbModalModule,
     NgbCollapseModule,
     NgbPopoverModule
   ],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: HttpRequestInterceptor,
-    multi: true
-  }],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpRequestInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

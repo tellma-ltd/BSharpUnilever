@@ -83,6 +83,10 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
   vertical-align: middle;
 }
 
+.b-pointer {
+  cursor: pointer;
+}
+
 // Makes sure that tiles don't collapse when certain
 // fields inside them are empty
 .b-tile span:empty:before {
@@ -90,7 +94,7 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
 }
 
 .b-tile {
-  cursor: pointer;
+  @extend .b-pointer;
 }
 
 .b-tile:hover {

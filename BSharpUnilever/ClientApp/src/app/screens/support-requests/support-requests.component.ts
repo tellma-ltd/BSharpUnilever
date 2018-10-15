@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SupportRequest, SupportRequestReason } from '../../data/entities/SupportRequest';
 
 @Component({
   selector: 'b-support-requests',
@@ -12,4 +13,18 @@ export class SupportRequestsComponent implements OnInit {
   ngOnInit() {
   }
 
+  public requestedValue(supportRequest: SupportRequest) {
+    let result: number = null;
+    if (!!supportRequest.LineItems) {
+      result = 0;
+      for (let i = 0; i < supportRequest.LineItems.length; i++) {
+        result += supportRequest.LineItems[i].RequestedValue;
+      }
+    }
+    return result;
+  }
+
+  getReasonDisplay(key: string): string {
+    return SupportRequestReason[key];
+  }
 }

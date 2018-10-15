@@ -1,5 +1,24 @@
-<b-master>
-  <p>
-    users works!
-  </p>
+<b-master controller="users"
+          [tileTemplate]="tile"
+          [tableDefinition]="[
+              { display: 'Full Name', orderBy: 'FullName' },
+              { display: 'Email', orderBy: 'Email' } ,
+              { display: 'Role', orderBy: 'Role' } ,
+              { display: 'Confirmed Email?', orderBy: 'EmailConfirmed' }
+
+            ]"
+          [tableRowTemplate]="row">
+
 </b-master>
+
+<ng-template #tile let-model="model">
+  <span class="d-block text-truncate">{{model.FullName}}</span>
+  <span class="small">{{model.Email}}</span>
+</ng-template>
+
+<ng-template #row let-model="model">
+  <td>{{ model.FullName }}</td>
+  <td>{{ model.Email }}</td>
+  <td>{{ model.Role }}</td>
+  <td>{{ (model.EmailConfirmed ? 'Yes' : 'No') }}</td>
+</ng-template>

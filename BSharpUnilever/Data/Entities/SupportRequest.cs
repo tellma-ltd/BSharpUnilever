@@ -17,6 +17,8 @@ namespace BSharpUnilever.Data.Entities
 
         public int SerialNumber { get; set; }
 
+        [MaxLength(255)]
+        [Required]
         public string State { get; set; }
 
         [Required]
@@ -114,9 +116,13 @@ namespace BSharpUnilever.Data.Entities
         public int SupportRequestId { get; set; }
         public SupportRequest SupportRequest { get; set; }
 
-        public int FromState { get; set; } // Same states as SupportRequest
+        [MaxLength(255)]
+        [Required]
+        public string FromState { get; set; } // Same states as SupportRequest
 
-        public int ToState { get; set; } // Same states as SupportRequest
+        [MaxLength(255)]
+        [Required]
+        public string ToState { get; set; } // Same states as SupportRequest
 
         public DateTimeOffset Time { get; set; }
 

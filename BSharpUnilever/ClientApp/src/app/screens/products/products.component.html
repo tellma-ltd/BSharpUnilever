@@ -1,3 +1,27 @@
-<p>
-  products works!
-</p>
+<b-master controller="products"
+          [tileTemplate]="tile"
+          [tableDefinition]="[
+              { display: 'Description', orderBy: 'Description' },
+              { display: 'Barcode', orderBy: 'Barcode' } ,
+              { display: 'SAP Material Code', orderBy: 'SapCode' } ,
+              { display: 'Type', orderBy: 'Type' },
+              { display: 'Promo?', orderBy: 'IsPromo' },
+              { display: 'Active?', orderBy: 'IsActive' }
+            ]"
+          [tableRowTemplate]="row">
+
+</b-master>
+
+<ng-template #tile let-model="model">
+  <span class="d-block text-truncate">{{model.Description}}</span>
+  <span class="small">{{model.Barcode}}</span>
+</ng-template>
+
+<ng-template #row let-model="model">
+  <td>{{ model.Description }}</td>
+  <td>{{ model.Barcode }}</td>
+  <td>{{ model.SapCode }}</td>
+  <td>{{ getDisplay(model.Type) }}</td>
+  <td>{{ (model.IsPromo ? 'Yes' : 'No') }}</td>
+  <td>{{ (model.IsActive ? 'Yes' : 'No') }}</td>
+</ng-template>
