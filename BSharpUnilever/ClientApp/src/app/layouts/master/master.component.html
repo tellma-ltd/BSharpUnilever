@@ -1,3 +1,98 @@
-<p>
-  master works!
-</p>
+<div class="h-100 d-flex flex-column">
+  <div class="row">
+    <!-- Breadcrumb -->
+    <!--<div class="d-none d-md-block col-md-6 p-0">
+      <ul class="breadcrumb bg-white mb-0">
+        <li class="breadcrumb-item">Users</li>
+      </ul>
+    </div>-->
+    <!-- Search box -->
+    <div class="col-12 p-1">
+      <input class="form-control" type="text" placeholder="Search..." [(ngModel)]="search" />
+    </div>
+
+    <!-- Toolbar -->
+    <div class="col-12 p-1 border d-flex justify-content-between">
+
+      <!-- Left Buttons -->
+      <div>
+        <!-- Create -->
+        <button class="btn btn-primary btn-sm b-toolbar-margins">
+          <fa-icon icon="plus"></fa-icon>
+          <span class="d-none d-md-inline ">&nbsp;&nbsp;Create</span>
+        </button>
+
+        <!-- Refresh -->
+        <button class="btn btn-light btn-sm text-primary b-white-button b-toolbar-margins">
+          <fa-icon icon="sync-alt"></fa-icon>
+          <span class="d-none d-md-inline ">&nbsp;&nbsp;Refresh</span>
+        </button>
+      </div>
+
+      <!-- Right Buttons -->
+      <div>
+        <!-- Paging -->
+        <div class="d-inline small mr-2 ml-2">
+          <span class="b-vertical-align-middle">{{ from | number }}-{{ to | number }}</span>
+          <span class="b-vertical-align-middle"> / {{ total | number }}</span>
+        </div>
+        <div class="d-inline">
+          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+                  type="button" title="First" (click)="onFirstPage()" [disabled]="!canFirstPage">
+            <fa-icon icon="angle-double-left"></fa-icon>
+          </button>
+          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+                  type="button" title="First" (click)="onPreviousPage()" [disabled]="!canPreviousPage">
+            <fa-icon icon="angle-left"></fa-icon>
+          </button>
+          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+                  type="button" title="First" (click)="onNextPage()" [disabled]="!canNextPage">
+            <fa-icon icon="angle-right"></fa-icon>
+          </button>
+        </div>
+
+        <!-- Tiles & Table buttons -->
+        <div class="btn-group btn-group-toggle b-toolbar-margins">
+          <label class="btn btn-sm btn-light" [class.active]="showTilesView" title="Tiles" (click)="onTilesView()">
+            <input type="radio" name="searchView"><fa-icon icon="th-large"></fa-icon>
+          </label>
+          <label class="btn btn-sm btn-light" [class.active]="showTableView" title="Table" (click)="onTableView()">
+            <input type="radio" name="searchView"><fa-icon icon="list"></fa-icon>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The search results -->
+  <div class="row b-rest-of-screen bg-light">
+
+    <!-- Tiles -->
+    <div class="col-12" *ngIf="showTilesView">
+      <div class="row">
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 p-0 p-sm-1" *ngFor="let model of masterData">
+          <div class="border p-2 bg-white b-tile" [routerLink]="['./', 15]">
+            <ng-container *ngTemplateOutlet="tileTemplate;context: { model: model }">
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!--<div class="w-100 row m-0 p-0 p-sm-1 mb-2" *ngIf="showTilesView">
+    <ng-container *ngFor="let model of masterData">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 p-0 p-sm-1 b-tile">
+        <div class="border p-2 bg-white b-pointer" [class.b-recent-tile]="isRecentlyOpened(model)" [routerLink]="['./', model.Entity.Id]">
+          <ng-container *ngTemplateOutlet="tileTemplate;context: { model: model }">
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+  </div>-->
+
+  </div>
+</div>
+

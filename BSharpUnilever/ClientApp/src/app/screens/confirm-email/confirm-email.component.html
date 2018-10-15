@@ -1,3 +1,28 @@
-<p>
-  confirm-email works!
-</p>
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <b-auth class="col">
+
+      <!-- Indicator -->
+      <div class="text-center" *ngIf="!!showSpinner">
+        <b-spinner></b-spinner>
+        <span>&nbsp;&nbsp;Processing your request...</span>
+      </div>
+
+      <!-- Success Message -->
+      <b-success-message *ngIf="isConfirmed">
+        Thank you for confirming your email! Please choose a password below
+      </b-success-message>
+
+      <!-- Error Message -->
+      <b-error-message *ngIf="errorMessage">
+        {{errorMessage}}
+      </b-error-message>
+
+      <!-- Reset Password -->
+      <div class="pt-3" *ngIf="isConfirmed">
+        <b-reset-password-control>
+        </b-reset-password-control>
+      </div>
+    </b-auth>
+  </div>
+</div>

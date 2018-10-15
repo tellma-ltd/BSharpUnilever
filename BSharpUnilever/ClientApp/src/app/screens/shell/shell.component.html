@@ -1,6 +1,23 @@
-<p>
-  shell works!
-</p>
-<router-outlet>
+<div class="d-flex flex-column h-100">
+  <div class="navbar navbar-dark bg-dark navbar-expand-md">
+    <a routerLink="support-requests">
+      <b-brand></b-brand>
+    </a>
+    <button type="button" class="navbar-toggler" (click)="onToggleCollapse()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed">
+      <ol class="nav navbar-nav justify-content-between">
+        <li class="nav-item"><a class="nav-link" routerLink="support-requests" routerLinkActive="active">Support Requests</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="stores"  routerLinkActive="active">Stores</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="products" routerLinkActive="active">Products</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="users" routerLinkActive="active">Users</a></li>
+        <li class="nav-item"><a class="nav-link" href="javascript:void(0)" (click)="onSignOut()">Sign Out</a></li>
+      </ol>
+    </div>
+  </div>
+  <div class="b-rest-of-screen container-fluid">
+    <router-outlet></router-outlet>
+  </div>
+</div>
 
-</router-outlet>

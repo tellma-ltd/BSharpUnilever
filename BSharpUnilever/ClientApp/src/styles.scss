@@ -3,6 +3,7 @@
 
 // Customize Bootstrap by overriding its default variables
 $primary: #17a2b8; // Classy cyan
+$dark-primary: #008784;
 $info: #007bff; // Bright blue
 $enable-rounded: false; // Square corners
 $font-size-base: 0.9rem; // The default font (1rem) is too big
@@ -14,7 +15,7 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
   border-radius: 0;
 }
 
-// Change the striped 
+// Change the striped
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.03);
 }
@@ -34,3 +35,64 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
 
 
 ///////////////////////////////// BSharp /////////////////////////////////
+
+.b-brand {
+  color: $primary;
+}
+
+.b-banner {
+  height: 100vh;
+  background-image: url('assets/images/banner.jpg');
+  background-position: 50%;
+  background-size: cover;
+}
+
+.b-marketing-banner-text {
+  width: 100%;
+  color: white;
+  font-size: 3rem;
+  letter-spacing: -1px;
+  background: rgb(0, 0, 0);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+}
+
+// If its parent is a column flex box, it occupies the rest of the screen
+.b-rest-of-screen {
+  flex: 1 0;
+  overflow-y: auto;
+}
+
+.b-toolbar-margins {
+  margin-right: 0.125rem;
+  margin-left: 0.125rem;
+}
+
+// These are buttons that only have an icon in them
+.b-white-button, .b-white-button.disabled, .b-white-button:disabled {
+  background: white;
+  border-color: white;
+}
+
+// Make the primary text a little darker since easier to read
+.text-primary {
+  color: $dark-primary!important;
+}
+
+.b-vertical-align-middle {
+  vertical-align: middle;
+}
+
+// Makes sure that tiles don't collapse when certain
+// fields inside them are empty
+.b-tile span:empty:before {
+  content: "\200b";
+}
+
+.b-tile {
+  cursor: pointer;
+}
+
+.b-tile:hover {
+  box-shadow: 2px 2px 2px -2px dimgrey;
+}

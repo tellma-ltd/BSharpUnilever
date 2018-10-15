@@ -1,3 +1,56 @@
-<p>
-  sign-in works!
-</p>
+<div class="container-fluid h-100">
+  <div class="row h-100">
+    <b-auth class="col-xl-5">
+
+      <!-- Error Message -->
+      <b-error-message *ngIf="errorMessage">
+        {{errorMessage}}
+      </b-error-message>
+
+      <!-- Email -->
+      <div class="form-group pt-3">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-control" type="text" id="email" name="email" email [(ngModel)]="email" />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
+      </div>
+
+      <!-- Sign In Button-->
+      <button class="btn btn-primary mt-3 w-100" type="button" [disabled]="!!showSpinner" (click)="onSignIn()">
+        <fa-icon icon="sign-in-alt"></fa-icon>&nbsp;&nbsp;Sign in
+      </button>
+
+      <!-- Forgot your password -->
+      <div class="small mt-3 d-flex justify-content-center">
+        <span class="text-light">Forgot your password?&nbsp;</span>
+        <a routerLink="/forgot-password">Click here</a>
+      </div>
+
+      <!-- Indicator -->
+      <div class="p-4 text-white d-flex justify-content-center" style="height:30px">
+        <!-- The fixed 30px prevents a jerk when the indicator is dynamically displayed -->
+        <b-spinner *ngIf="!!showSpinner"></b-spinner>
+        <span *ngIf="!!showSpinner">&nbsp;&nbsp;Signing you in...</span>
+      </div>
+
+      <!-- Legal Stuff -->
+      <div class="text-center pt-5">
+        Copyright © 2000 - {{currentYear}} Banan IT, Ltd. All rights reserved.
+      </div>
+      <div class="text-center">
+        <a routerLink="/terms-of-service">Terms Of Service</a>
+        |
+        <a routerLink="/privacy-policy">Privacy Policy</a>
+      </div>
+    </b-auth>
+
+    <!-- Banner image to the right, visible on large screens -->
+    <div class="d-none d-xl-flex justify-content-center align-items-center text-center h-100 col-xl-7 b-banner">
+      <div class="b-marketing-banner-text">Let's create the future <strong>together</strong>.</div>
+    </div>
+  </div>
+</div>

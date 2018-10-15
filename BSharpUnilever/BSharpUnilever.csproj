@@ -31,6 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\data\entities\auth\AuthTokenResponse.ts" />
+    <None Remove="ClientApp\src\app\data\entities\ListResult.ts" />
     <None Remove="ClientApp\src\app\data\entities\Product.ts" />
     <None Remove="ClientApp\src\app\data\entities\Store.ts" />
     <None Remove="ClientApp\src\app\data\entities\SupportRequest.ts" />
@@ -39,11 +41,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\data\entities\auth\AuthTokenResponse.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\data\entities\ListResult.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\data\entities\Product.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\data\entities\Store.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\data\entities\SupportRequest.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\data\entities\User.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\misc\util.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\layouts\success-message\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

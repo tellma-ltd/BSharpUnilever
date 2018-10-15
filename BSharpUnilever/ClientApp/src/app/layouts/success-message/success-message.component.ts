@@ -2,14 +2,10 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'b-success-message',
-  templateUrl: './success-message.component.html',
-  styleUrls: ['./success-message.component.scss']
+  template: `<div class="border p-2 alert-success">
+              <fa-icon icon="check"></fa-icon>&nbsp;&nbsp;<ng-content></ng-content>
+            </div>`
 })
-export class SuccessMessageComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
+export class SuccessMessageComponent {
 
 }

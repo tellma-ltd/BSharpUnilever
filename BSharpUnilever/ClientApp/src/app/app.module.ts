@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgbDropdownModule, NgbPopoverModule, NgbModalModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { AppComponent } from './app.component';
 import { PageNotFoundComponent } from './screens/page-not-found/page-not-found.component';
@@ -36,7 +37,29 @@ import { AuthGuard } from './misc/auth.guard';
 import { HttpRequestInterceptor } from './data/http-interceptor';
 import { ErrorMessageComponent } from './layouts/error-message/error-message.component';
 import { SuccessMessageComponent } from './layouts/success-message/success-message.component';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { ResetPasswordControlComponent } from './screens/reset-password/reset-password-control.component';
+import {
+  faExclamationTriangle,
+  faSpinner,
+  faSignInAlt,
+  faKey,
+  faCheck,
+  faPlus,
+  faSyncAlt,
+  faAngleDoubleLeft,
+  faAngleLeft,
+  faAngleRight,  faThLarge,
+  faList
+} from '@fortawesome/free-solid-svg-icons';
 
+// Icons to be used in the app
+library.add(
+  faExclamationTriangle, faSpinner, faSignInAlt,
+  faKey, faCheck, faPlus, faSyncAlt, faAngleDoubleLeft,
+  faAngleLeft, faAngleRight, faThLarge, faList);
+
+// Routing configuration
 const routes: Routes = [
   { path: 'sign-in', component: SignInComponent, canActivate: [AuthNoGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [AuthNoGuard] },
@@ -45,9 +68,10 @@ const routes: Routes = [
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'terms-of-service', component: TermsOfServiceComponent },
   {
-    path: '',
+    path: 'client',
     component: ShellComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       { path: 'users', component: UsersComponent },
       { path: 'users/:id', component: UserDetailsComponent },
@@ -58,9 +82,9 @@ const routes: Routes = [
       { path: 'support-requests', component: SupportRequestsComponent },
       { path: 'support-requests/:id', component: SupportRequestDetailsComponent },
       { path: 'data', component: DataComponent },
-      { path: '', redirectTo: '/support-requests', pathMatch: 'full' },
     ]
   },
+  { path: '', redirectTo: 'client/support-requests', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 ];
 
@@ -93,17 +117,19 @@ const routes: Routes = [
     DecimalEditorComponent,
     DetailsPickerComponent,
     ErrorMessageComponent,
-    SuccessMessageComponent
+    SuccessMessageComponent,
+    ResetPasswordControlComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
+    FontAwesomeModule,
     NgbDropdownModule,
     NgbModalModule,
     NgbCollapseModule,
-    NgbPopoverModule,
+    NgbPopoverModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

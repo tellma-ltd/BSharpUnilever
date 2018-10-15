@@ -8,7 +8,7 @@ namespace BSharpUnilever.Controllers.ViewModels.Auth
     /// <summary>
     /// Represents the authentication token and some of its content
     /// </summary>
-    public class AuthenticationTokenResponseVM
+    public class AuthTokenResponseVM
     {
         public string Token { get; set; }
 

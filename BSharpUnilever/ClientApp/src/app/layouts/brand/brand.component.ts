@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding, Input } from '@angular/core';
 
 @Component({
   selector: 'b-brand',
   templateUrl: './brand.component.html',
-  styleUrls: ['./brand.component.scss']
+  styleUrls: ['./brand.component.scss'],
 })
-export class BrandComponent implements OnInit {
+export class BrandComponent {
 
-  constructor() { }
+  @Input()
+  public scale = 1;
 
-  ngOnInit() {
-  }
-
+  @HostBinding('class.navbar-brand')
+  navbarBrand = true;
 }

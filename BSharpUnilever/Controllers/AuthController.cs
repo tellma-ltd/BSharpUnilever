@@ -45,7 +45,7 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpPost("create-token")]
-        public async Task<ActionResult<AuthenticationTokenResponseVM>> CreateToken([FromBody] CreateTokenVM model)
+        public async Task<ActionResult<AuthTokenResponseVM>> CreateToken([FromBody] CreateTokenVM model)
         {
             // This is the endpoint where users sign in
 
@@ -96,7 +96,7 @@ namespace BSharpUnilever.Controllers
 
         [Authorize] // IMPORTANT!
         [HttpGet("refresh-token")]
-        public ActionResult<AuthenticationTokenResponseVM> RefreshToken()
+        public ActionResult<AuthTokenResponseVM> RefreshToken()
         {
             // The client web app uses this endpoint to refresh the token every 1h in order to 
             // keep the user session alive permanently as long as the client remains open
@@ -172,7 +172,8 @@ namespace BSharpUnilever.Controllers
                 // In a bigger app, the SPA and the API should be independent and the API can't't know where
                 // the SPA is and the setup below would have to change, but for our purposes this is fine for
                 // now and a lot easier as the SPA is available and already comes with all the styling
-                string uri = Url.Content("~/forgot-password");
+                string uri = $"https://{Request.Host}/{Request.PathBase}reset-password";
+
                 uri = QueryHelpers.AddQueryString(uri, "userId", user.Id);
                 uri = QueryHelpers.AddQueryString(uri, "passwordResetToken", passwordResetToken);
 
@@ -218,7 +219,7 @@ namespace BSharpUnilever.Controllers
 
                 // Reset the password by utilizing the injected user manager
                 IdentityResult result = await _userManager.ResetPasswordAsync(user, model.PasswordResetToken, model.NewPassword);
-                if (result.Succeeded)
+                if (!result.Succeeded)
                 {
                     return BadRequest(result.ErrorMessage("Could not reset password"));
                 }
@@ -241,7 +242,7 @@ namespace BSharpUnilever.Controllers
         /// </summary>
         /// <param name="email">The email of the authenticated user</param>
         /// <returns></returns>
-        private AuthenticationTokenResponseVM CreateJwtToken(string email)
+        private AuthTokenResponseVM CreateJwtToken(string email)
         {
             // A uniqe Id for this particular token
             var jti = Guid.NewGuid().ToString();
@@ -265,7 +266,7 @@ namespace BSharpUnilever.Controllers
             
 
             // Return the token wrapped inside a friendly data structure
-            var tokenResponse = new AuthenticationTokenResponseVM
+            var tokenResponse = new AuthTokenResponseVM
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Expiration = token.ValidTo,
