@@ -55,7 +55,8 @@ import {
   faEdit,
   faTrashAlt,
   faSave,
-  faTimes
+  faTimes,
+  faDownload
 } from '@fortawesome/free-solid-svg-icons';
 import { GlobalsResolverService } from './data/globals-resolver.service';
 import { SerialPipe } from './misc/serial.pipe';
@@ -66,7 +67,8 @@ import { MyAccountComponent } from './screens/my-account/my-account.component';
 library.add(
   faExclamationTriangle, faSpinner, faSignInAlt, faSignOutAlt,
   faKey, faCheck, faPlus, faSyncAlt, faAngleDoubleLeft,
-  faAngleLeft, faAngleRight, faThLarge, faList, faEdit, faTrashAlt, faSave, faTimes
+  faAngleLeft, faAngleRight, faThLarge, faList, faEdit, faTrashAlt,
+  faSave, faTimes, faDownload
 );
 
 // Routing configuration
@@ -93,7 +95,7 @@ const routes: Routes = [
       { path: 'support-requests', component: SupportRequestsComponent },
       { path: 'support-requests/:id', component: SupportRequestDetailsComponent, canDeactivate: [DeactivateGuard] },
       { path: 'data', component: DataComponent },
-      { path: 'my-account', component: MyAccountComponent},
+      { path: 'my-account', component: MyAccountComponent, canDeactivate: [DeactivateGuard]},
     ]
   },
   { path: '', redirectTo: 'client/support-requests', pathMatch: 'full' },

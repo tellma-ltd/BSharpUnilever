@@ -4,6 +4,8 @@ var http_1 = require("@angular/common/http");
 function friendly(error) {
     // Translates HttpClient into human-friendly errors
     var result = '';
+    console.log(error);
+    console.log(error.error instanceof ErrorEvent);
     if (error instanceof http_1.HttpErrorResponse) {
         var response = error;
         switch (response.status) {

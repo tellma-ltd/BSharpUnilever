@@ -183,9 +183,7 @@ namespace BSharpUnilever.Controllers
             }
         }
 
-
         [HttpGet("data")]
-        [AllowAnonymous]
         public async Task<ActionResult> GetData()
         {
             // This API returns all support requests in one big Excel file, leaving it
@@ -270,8 +268,7 @@ namespace BSharpUnilever.Controllers
                         // Save the Excel to the memory stream and return it
                         p.Save();
                         return File(fileContents: memStream.ToArray(),
-                            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            fileDownloadName: $"SupportRequests_{DateTime.Today:d}.xlsx");
+                            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                     }
                 }
             }

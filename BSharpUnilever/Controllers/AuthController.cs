@@ -149,6 +149,44 @@ namespace BSharpUnilever.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordVM model)
+        {
+            // This is called when the user presses the confirm email link that is sent to his/her inbox 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("There is something wrong with the request payload"); // TODO: Return friendlier validation errors
+            }
+
+            try
+            {
+                // Get the user
+                var username = User.UserName();
+                var user = await _userManager.FindByNameAsync(username);
+                if (user == null)
+                {
+                    // This is only possible if the admin deletes the user while the user is logged in
+                    return BadRequest("Your account was deleted");
+                }
+
+                // Rely on the injected user manager to validate the token and confirm the user's email
+                IdentityResult result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(result.ErrorMessage("Could not change password"));
+                }
+
+                // All good
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("forgot-password")]
         public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordVM model)
         {

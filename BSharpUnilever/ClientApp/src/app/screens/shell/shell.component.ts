@@ -35,4 +35,9 @@ export class ShellComponent {
   get currentUserRole() {
     return this.globals.currentUser.Role;
   }
+
+  get canViewData(): boolean {
+    return this.globals.currentUser.Role === "Manager" ||
+      this.globals.currentUser.Role === "Administrator";
+  }
 }

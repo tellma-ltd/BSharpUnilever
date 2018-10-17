@@ -12,6 +12,7 @@
         <li class="nav-item"><a class="nav-link" routerLink="stores" routerLinkActive="active" (click)="onCollapse()">Stores</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="products" routerLinkActive="active" (click)="onCollapse()">Products</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="users" routerLinkActive="active" (click)="onCollapse()">Users</a></li>
+        <li class="nav-item" *ngIf="canViewData"><a class="nav-link" routerLink="data" routerLinkActive="active" (click)="onCollapse()">Data</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="my-account" routerLinkActive="active" (click)="onCollapse()">{{ currentUserFullName }}</a></li>
       </ol>
       <ol class="nav navbar-nav">

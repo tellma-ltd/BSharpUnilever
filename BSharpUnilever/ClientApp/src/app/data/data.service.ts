@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable, throwError } from 'rxjs';
 import { ListResult } from './entities/ListResult';
-import { takeUntil, catchError, tap, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, tap, finalize, map } from 'rxjs/operators';
 import { friendly } from '../misc/util';
 import { User } from './entities/User';
 import { Store } from './entities/Store';
@@ -50,6 +50,18 @@ export class DataService {
     getAll: this.getAllFactory<SupportRequest>('supportrequests'),
     get: this.getFactory<SupportRequest>('supportrequests'),
     post: this.postFactory<SupportRequest>('supportrequests'),
+    getData: (cancellationToken$: Observable<void>) => {
+      const url = `api/supportrequests/data`;
+      const obs$ = this.http.get(url, { responseType: 'blob' }).pipe(
+        catchError((error) => {
+          const friendlyError = friendly(error);
+          return throwError(friendlyError);
+        }),
+        takeUntil(cancellationToken$),
+        takeUntil(this.auth.signedOut$)
+      );
+      return obs$;
+    }
   };
 
   // Factory methods so as not to repeat ourselves

@@ -152,6 +152,23 @@ export class AuthService {
     return obs$;
   }
 
+  public changePassword(currentPassword: string, newPassword: string): Observable<boolean> {
+    const url = `api/auth/change-password`;
+
+    const obs$ = this.http.post(url, { CurrentPassword: currentPassword, newPassword: newPassword}, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      map(() => true),
+      catchError((error) => {
+        const friendlyError = friendly(error);
+        return throwError(friendlyError);
+      }),
+      takeUntil(this.signedOut$)
+    );
+
+    return obs$;
+  }
+
   private signInCallback(tokenResponse: AuthTokenResponse) {
     // Store the freshly obtained ID token in localstorage if it has a later expiry date
     const currentToken = this.localStorageToken;

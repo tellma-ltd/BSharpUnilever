@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
 export function friendly(error: any) {
-  // Translates HttpClient into human-friendly errors
+  // Translates HttpClient's errors into human-friendly errors
   let result = '';
-
   if (error instanceof HttpErrorResponse) {
     const response = <HttpErrorResponse>error;
+    
     switch (response.status) {
       case 0: { // Offline
         result = `Unable to reach the server, please check the connection of your device`;

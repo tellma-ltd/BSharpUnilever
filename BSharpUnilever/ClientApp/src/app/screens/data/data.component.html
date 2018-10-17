@@ -1,3 +1,24 @@
-<p>
-  data works!
-</p>
+<div class="d-flex flex-column align-items-start">
+  <p class="mt-3">
+    Download all support requests in an Excel file for analysis and reports:
+  </p>
+  <button class="btn btn-primary" type="button" (click)="onDownload()">
+    <fa-icon icon="download"></fa-icon>&nbsp;&nbsp;Download Data
+  </button>
+  <div class="mt-3">
+    <!-- Indicator -->
+    <div class="text-center" *ngIf="showSpinner">
+      <b-spinner></b-spinner>
+      <span>&nbsp;&nbsp;Downloading...</span>
+    </div>
+
+    <!-- Error message -->
+    <b-error-message *ngIf="errorMessage">
+      {{errorMessage}}
+    </b-error-message>
+
+    <b-success-message *ngIf="successMessage">
+      {{successMessage}}
+    </b-success-message>
+  </div>
+</div>

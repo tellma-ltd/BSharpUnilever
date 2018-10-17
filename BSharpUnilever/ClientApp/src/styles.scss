@@ -139,6 +139,10 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
   border-color: $danger;
 }
 
+.is-invalid .b-input:focus {
+  box-shadow: 0 2px $danger;
+}
+
 // The style for the "Saving" indicator at the bottom right
 .b-corner-indicator {
   position: fixed;
