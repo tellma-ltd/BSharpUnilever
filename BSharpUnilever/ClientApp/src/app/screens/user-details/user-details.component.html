@@ -24,10 +24,10 @@
   <!-- Email -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Email</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit || !!(viewModel?.Id)">{{viewModel?.Email}}</div>
         <input class="w-100 b-input form-control" *ngIf="isEdit && !(viewModel?.Id)" [(ngModel)]="editModel.Email" required email
                #emailControl="ngModel" [class.is-invalid]="emailControl.invalid && emailControl.touched" />
@@ -38,10 +38,10 @@
   <!-- Role -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Role</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.Role}}</div>
         <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Role" required
                #roleControl="ngModel" [class.is-invalid]="roleControl.invalid && roleControl.touched" >
@@ -54,10 +54,10 @@
   <!-- EmailConfirmed -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Confirmed Email?</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div>{{viewModel?.EmailConfirmed ? 'Yes' : 'No'}}</div>
       </div>
     </div>

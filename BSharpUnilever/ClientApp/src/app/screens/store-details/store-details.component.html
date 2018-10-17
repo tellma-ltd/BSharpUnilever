@@ -25,14 +25,13 @@
   <!-- Account Executive -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Key Account Executive</span>
       </div>
-      <div class="col-12 col-lg-9">
-        <div *ngIf="!isEdit">{{viewModel?.AccountExecutive?.FullName}}</div>
+      <div class="col-12 col-lg-8">
+        <a *ngIf="!isEdit" [routerLink]="['../../users', viewModel?.AccountExecutive?.Id]">{{viewModel?.AccountExecutive?.FullName}}</a>
         <b-details-picker *ngIf="isEdit" [(ngModel)]="editModel.AccountExecutive" controller="users" [formatter]="userFormatter" required
                           #accountExecControl="ngModel" [class.is-invalid]="accountExecControl.invalid && accountExecControl.touched">
-
         </b-details-picker>
       </div>
     </div>
@@ -42,10 +41,10 @@
   <!-- Is Active -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Is Active?</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.IsActive ? 'Yes' : 'No'}}</div>
         <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsActive"
                #isActiveControl="ngModel" [class.is-invalid]="isActiveControl.invalid && isActiveControl.touched" />

@@ -213,7 +213,7 @@ namespace BSharpUnilever.Controllers
                         var cells = p.Workbook.Worksheets.Add("Support Requests").Cells;
                         int row = 1;
                         int col = 1;
-                        var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c.ToString()).ToArray();
+                        var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c+"").ToArray();
 
                         /////// Set all the header labels and the column styles
                         cells[cols[col] + row].Value = "Date";

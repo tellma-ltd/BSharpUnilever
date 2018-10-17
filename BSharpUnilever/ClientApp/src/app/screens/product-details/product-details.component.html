@@ -25,10 +25,10 @@
   <!-- Barcode -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Barcode</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.Barcode}}</div>
         <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Barcode" required
                #barcodeControl="ngModel" [class.is-invalid]="barcodeControl.invalid && barcodeControl.touched" />
@@ -39,10 +39,10 @@
   <!-- SapCode -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">SAP Material Code</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.SapCode}}</div>
         <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.SapCode" required
                #sapCodeControl="ngModel" [class.is-invalid]="sapCodeControl.invalid && sapCodeControl.touched" />
@@ -53,10 +53,10 @@
   <!-- Type -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Type</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{ typeDisplay(viewModel?.Type) }}</div>
         <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Type" required
                 #typeControl="ngModel" [class.is-invalid]="typeControl.invalid && typeControl.touched">
@@ -69,10 +69,10 @@
   <!-- Is Promo -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Is Promo?</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.IsPromo ? 'Yes' : 'No'}}</div>
         <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsPromo"
                #isPromoControl="ngModel" [class.is-invalid]="isPromoControl.invalid && isPromoControl.touched" />
@@ -83,10 +83,10 @@
   <!-- Is Active -->
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
-      <div class="font-weight-bold small col-12 col-lg-3">
+      <div class="font-weight-bold small col-12 col-lg-4">
         <span class="b-vertical-align-middle">Is Active?</span>
       </div>
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-8">
         <div *ngIf="!isEdit">{{viewModel?.IsActive ? 'Yes' : 'No'}}</div>
         <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsActive"
                #isActiveControl="ngModel" [class.is-invalid]="isActiveControl.invalid && isActiveControl.touched" />

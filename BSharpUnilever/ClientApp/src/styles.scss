@@ -33,6 +33,10 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
   }
 }
 
+a {
+  color: $dark-primary;
+}
+
 ///////////////////////////////// BSharp /////////////////////////////////
 
 .b-brand {
