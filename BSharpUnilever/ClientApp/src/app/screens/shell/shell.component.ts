@@ -20,6 +20,10 @@ export class ShellComponent {
     this.isCollapsed = !this.isCollapsed;
   }
 
+  onCollapse() {
+    this.isCollapsed = true;
+  }
+
   onSignOut() {
     this.auth.signOutAndChallengeUser();
   }

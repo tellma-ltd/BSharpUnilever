@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { GlobalsResolverService } from '../../data/globals-resolver.service';
 
 @Component({
   selector: 'b-users',
   templateUrl: './users.component.html',
-  styles: []
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent {
 
-  constructor() { }
+  constructor(private globals: GlobalsResolverService) { }
 
-  ngOnInit() {
+  canCreate = () => {
+    return this.globals.currentUser.Role === 'Administrator';
   }
-
 }

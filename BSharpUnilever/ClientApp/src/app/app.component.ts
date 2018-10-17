@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { DataService } from './data/data.service';
 
 @Component({
   selector: 'b-root',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  constructor(private data: DataService) { }
 
+  get isSaving(): boolean {
+    return this.data.isSaving;
+  }
 }

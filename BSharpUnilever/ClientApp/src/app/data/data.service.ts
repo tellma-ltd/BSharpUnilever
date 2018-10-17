@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable, throwError } from 'rxjs';
 import { ListResult } from './entities/ListResult';
-import { takeUntil, catchError, tap } from 'rxjs/operators';
+import { takeUntil, catchError, tap, finalize } from 'rxjs/operators';
 import { friendly } from '../misc/util';
 import { User } from './entities/User';
 import { Store } from './entities/Store';
@@ -15,7 +15,7 @@ import { SupportRequest } from './entities/SupportRequest';
 })
 export class DataService {
 
-  public isPosting = false;
+  public isSaving = false;
 
   constructor(private http: HttpClient, private auth: AuthService) { }
 
@@ -107,18 +107,19 @@ export class DataService {
 
   private postFactory<T>(controller: string) {
     return (entity: T, cancellationToken$: Observable<void>) => {
-      this.isPosting = true;
+      this.isSaving = true;
       const obs$ = this.http.post<T>(`api/${controller}`, entity, {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       }).pipe(
-        tap(() => this.isPosting = false),
+        tap(() => this.isSaving = false),
         catchError((error) => {
-          this.isPosting = false;
+          this.isSaving = false;
           const friendlyError = friendly(error);
           return throwError(friendlyError);
         }),
         takeUntil(cancellationToken$),
         takeUntil(this.auth.signedOut$),
+        finalize(() => this.isSaving = false)
       );
 
       return obs$;
@@ -127,15 +128,18 @@ export class DataService {
 
   private deleteFactory<T>(controller: string) {
     return (id: any, cancellationToken$: Observable<void>) => {
+      this.isSaving = true;
       const url = `api/${controller}/${id}`;
 
       const obs$ = this.http.delete(url).pipe(
+        tap(() => this.isSaving = false),
         catchError((error) => {
           const friendlyError = friendly(error);
           return throwError(friendlyError);
         }),
         takeUntil(cancellationToken$),
-        takeUntil(this.auth.signedOut$)
+        takeUntil(this.auth.signedOut$),
+        finalize(() => this.isSaving = false)
       );
 
       return obs$;

@@ -12,10 +12,9 @@ export class DeactivateGuard implements CanDeactivate<ICanDeactivate> {
 
   canDeactivate(component: ICanDeactivate) {
 
-    if (this.data.isPosting) {
+    if (this.data.isSaving) {
       return false;
-    }
-    else {
+    } else {
       return component.canDeactivate ? component.canDeactivate() : true;
     }
   }

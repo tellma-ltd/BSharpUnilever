@@ -7,18 +7,18 @@
     </div>
 
     <!-- Toolbar -->
-    <div class="col-12 p-1 border d-flex justify-content-between">
+    <div class="col-12 p-1 border d-flex justify-content-between b-toolbar">
 
       <!-- Left Buttons -->
       <div>
         <!-- Create -->
-        <button class="btn btn-primary btn-sm b-toolbar-margins" (click)="onCreate()" [disabled]="!canCreate">
+        <button class="btn btn-primary btn-sm" (click)="onCreate()" [disabled]="!canCreate">
           <fa-icon icon="plus"></fa-icon>
           <span class="d-none d-md-inline ">&nbsp;&nbsp;Create</span>
         </button>
 
         <!-- Refresh -->
-        <button class="btn btn-light btn-sm text-primary b-white-button b-toolbar-margins" (click)="onRefresh()">
+        <button class="btn btn-light btn-sm text-primary b-white-button" (click)="onRefresh()">
           <fa-icon icon="sync-alt"></fa-icon>
           <span class="d-none d-md-inline ">&nbsp;&nbsp;Refresh</span>
         </button>
@@ -32,22 +32,22 @@
           <span class="b-vertical-align-middle"> / {{ total | number }}</span>
         </div>
         <div class="d-inline">
-          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+          <button class="btn btn-light btn-sm b-white-button"
                   type="button" title="First" (click)="onFirstPage()" [disabled]="!canFirstPage">
             <fa-icon icon="angle-double-left"></fa-icon>
           </button>
-          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+          <button class="btn btn-light btn-sm b-white-button"
                   type="button" title="First" (click)="onPreviousPage()" [disabled]="!canPreviousPage">
             <fa-icon icon="angle-left"></fa-icon>
           </button>
-          <button class="btn btn-light btn-sm b-white-button b-toolbar-margins"
+          <button class="btn btn-light btn-sm b-white-button"
                   type="button" title="First" (click)="onNextPage()" [disabled]="!canNextPage">
             <fa-icon icon="angle-right"></fa-icon>
           </button>
         </div>
 
         <!-- Tiles/Table Toggle -->
-        <div class="btn-group btn-group-toggle b-toolbar-margins">
+        <div class="btn-group btn-group-toggle">
           <label class="btn btn-sm btn-light" [class.active]="showTilesView" title="Tiles" (click)="onTilesView()">
             <input type="radio" name="searchView"><fa-icon icon="th-large"></fa-icon>
           </label>

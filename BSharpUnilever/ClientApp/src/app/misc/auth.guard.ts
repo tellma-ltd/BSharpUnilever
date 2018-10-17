@@ -10,7 +10,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(private auth: AuthService) { }
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
- 
+
     if (!this.auth.isAuthenticated) {
       // If the user is no longer authenticated, signal a
       // sign-out and navigate to the sign-in screen

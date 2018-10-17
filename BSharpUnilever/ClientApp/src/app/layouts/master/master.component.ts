@@ -42,6 +42,9 @@ export class MasterComponent implements OnInit, OnDestroy {
   @Input()
   public tableDefinition: { display: string, orderBy?: string }[];
 
+  @Input()
+  canCreatePred: () => boolean;
+
   private PAGE_SIZE = 50;
   private _search: string = null;
   private skip = 0;
@@ -60,7 +63,6 @@ export class MasterComponent implements OnInit, OnDestroy {
 
   constructor(
     private data: DataService,
-    private globals: GlobalsResolverService,
     private router: Router,
     private route: ActivatedRoute) {
 
@@ -254,7 +256,7 @@ export class MasterComponent implements OnInit, OnDestroy {
   }
 
   get canCreate() {
-    return this.globals.currentUser.Role === 'Administrator';
+    return !this.canCreatePred || this.canCreatePred();
   }
 
   onRefresh() {

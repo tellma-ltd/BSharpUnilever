@@ -134,7 +134,8 @@ namespace BSharpUnilever.Controllers
                     {
                         FullName = model.FullName,
                         UserName = model.Email,
-                        Email = model.Email
+                        Email = model.Email,
+                        Role = model.Role
                     };
 
                     // Create the user object in the identity store
@@ -145,12 +146,13 @@ namespace BSharpUnilever.Controllers
                     }
 
                     // Rely on the injected user manager to generate the email-confirmation and password-reset tokens
-                    string emailConfirmationToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    string emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                     // In a bigger app, the API should not know where the SPA lives
                     // But this is fine and convenient for now
-                    string uri = Url.Content("~/confirm-email");
+                    string uri = $"https://{Request.Host}/{Request.PathBase}confirm-email";
+
                     uri = QueryHelpers.AddQueryString(uri, "userId", user.Id);
                     uri = QueryHelpers.AddQueryString(uri, "emailConfirmationToken", emailConfirmationToken);
                     uri = QueryHelpers.AddQueryString(uri, "passwordResetToken", passwordResetToken);

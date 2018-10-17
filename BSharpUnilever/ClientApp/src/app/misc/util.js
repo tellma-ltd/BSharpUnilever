@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var http_1 = require("@angular/common/http");
 function friendly(error) {
+    // Translates HttpClient into human-friendly errors
     var result = '';
     if (error instanceof http_1.HttpErrorResponse) {
         var response = error;
@@ -19,7 +20,7 @@ function friendly(error) {
                 break;
             }
             case 403: { // Forbidden
-                result = "Sorry, your account does not have sufficient permissions to view this record";
+                result = "Sorry, your account does not have sufficient permissions";
                 break;
             }
             case 404: { // Not found
@@ -43,4 +44,10 @@ function friendly(error) {
     return result;
 }
 exports.friendly = friendly;
+function cloneModel(model) {
+    // This technique is simple and effective for cloning model objects, these objects
+    // have to be JSON friendly anyways since they travel from/to the server
+    return JSON.parse(JSON.stringify(model));
+}
+exports.cloneModel = cloneModel;
 //# sourceMappingURL=util.js.map

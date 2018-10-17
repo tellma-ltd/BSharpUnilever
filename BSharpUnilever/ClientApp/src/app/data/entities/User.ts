@@ -5,3 +5,11 @@ export class User {
   Role: string;
   EmailConfirmed: boolean;
 }
+
+
+export enum SupportRequestState {
+  KAE = 'KAE',
+  Manager = 'Manager',
+  Administrator = 'Administrator',
+  Inactive = 'Inactive',
+}

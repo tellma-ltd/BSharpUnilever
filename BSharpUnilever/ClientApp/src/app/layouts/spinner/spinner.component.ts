@@ -2,7 +2,7 @@ import { Component,  Input } from '@angular/core';
 
 @Component({
   selector: 'b-spinner',
-  template: `<fa-icon icon="spinner" [pulse]="true" [style.font-size]="(scale * 100) + '%'"></fa-icon>`,
+  template: `<fa-icon icon="spinner" [spin]="true" [style.font-size]="(scale * 100) + '%'"></fa-icon>`,
 })
 export class SpinnerComponent {
   @Input()

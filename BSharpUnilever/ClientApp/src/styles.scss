@@ -33,7 +33,6 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
   }
 }
 
-
 ///////////////////////////////// BSharp /////////////////////////////////
 
 .b-brand {
@@ -61,11 +60,6 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
 .b-rest-of-screen {
   flex: 1 0;
   overflow-y: auto;
-}
-
-.b-toolbar-margins {
-  margin-right: 0.125rem;
-  margin-left: 0.125rem;
 }
 
 // These are buttons that only have an icon in them
@@ -99,4 +93,64 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
 
 .b-tile:hover {
   box-shadow: 2px 2px 2px -2px dimgrey;
+}
+
+.b-paper {
+  max-width: 1150px;
+  box-shadow: 0 5px 20px -15px black;
+}
+
+.b-toolbar {
+  padding-right: 0.125rem!important;
+  padding-left: 0.125rem!important;
+}
+
+.b-toolbar button {
+  margin-right: 0.125rem;
+  margin-left: 0.125rem;
+}
+
+
+.b-h2 {
+  margin-bottom: 0.5rem;
+  font-family: inherit;
+  line-height: 1.2;
+  color: inherit;
+  font-size: 1.8rem;
+}
+
+.b-input {
+  border-width: 0 0 1px 0;
+  background-color: transparent;
+  padding: 0 !important;
+  height: auto;
+}
+
+.b-input:focus {
+  background-color: transparent;
+  box-shadow: 0 2px $primary;
+}
+
+.b-input.is-invalid:focus {
+  box-shadow: 0 2px $danger;
+}
+
+.is-invalid .b-input {
+  border-color: $danger;
+}
+
+// The style for the "Saving" indicator at the bottom right
+.b-corner-indicator {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 1051;
+  animation-delay: 0.1s;
+}
+
+// Edge browser shows a little X button in input fieldthat lets you
+// clear it field, but this button doesn't seem to signal angular
+// ngModel to update the model, so we simply hide the X button here
+input::-ms-clear {
+  display: none;
 }

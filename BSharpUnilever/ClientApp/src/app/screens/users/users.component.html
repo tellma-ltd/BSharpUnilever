@@ -1,4 +1,5 @@
 <b-master controller="users"
+          [canCreatePred]="canCreate"
           [tileTemplate]="tile"
           [tableDefinition]="[
               { display: 'Full Name', orderBy: 'FullName' },

@@ -1,4 +1,5 @@
 <b-master controller="stores"
+          [canCreatePred]="canCreate"
           [tileTemplate]="tile"
           [tableDefinition]="[
               { display: 'Name', orderBy: 'Name' },

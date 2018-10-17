@@ -51,16 +51,23 @@ import {
   faAngleDoubleLeft,
   faAngleLeft,
   faAngleRight,  faThLarge,
-  faList
+  faList,
+  faEdit,
+  faTrashAlt,
+  faSave,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { GlobalsResolverService } from './data/globals-resolver.service';
 import { SerialPipe } from './misc/serial.pipe';
+import { DeactivateGuard } from './misc/deactivate.guard';
+import { MyAccountComponent } from './screens/my-account/my-account.component';
 
 // Icons to be used in the app
 library.add(
   faExclamationTriangle, faSpinner, faSignInAlt, faSignOutAlt,
   faKey, faCheck, faPlus, faSyncAlt, faAngleDoubleLeft,
-  faAngleLeft, faAngleRight, faThLarge, faList);
+  faAngleLeft, faAngleRight, faThLarge, faList, faEdit, faTrashAlt, faSave, faTimes
+);
 
 // Routing configuration
 const routes: Routes = [
@@ -78,14 +85,15 @@ const routes: Routes = [
     resolve: { globals: GlobalsResolverService },
     children: [
       { path: 'users', component: UsersComponent },
-      { path: 'users/:id', component: UserDetailsComponent },
+      { path: 'users/:id', component: UserDetailsComponent, canDeactivate: [DeactivateGuard] },
       { path: 'stores', component: StoresComponent },
-      { path: 'stores/:id', component: StoreDetailsComponent },
+      { path: 'stores/:id', component: StoreDetailsComponent, canDeactivate: [DeactivateGuard] },
       { path: 'products', component: ProductsComponent },
-      { path: 'products/:id', component: ProductDetailsComponent },
+      { path: 'products/:id', component: ProductDetailsComponent, canDeactivate: [DeactivateGuard] },
       { path: 'support-requests', component: SupportRequestsComponent },
-      { path: 'support-requests/:id', component: SupportRequestDetailsComponent },
+      { path: 'support-requests/:id', component: SupportRequestDetailsComponent, canDeactivate: [DeactivateGuard] },
       { path: 'data', component: DataComponent },
+      { path: 'my-account', component: MyAccountComponent},
     ]
   },
   { path: '', redirectTo: 'client/support-requests', pathMatch: 'full' },
@@ -123,7 +131,8 @@ const routes: Routes = [
     ErrorMessageComponent,
     SuccessMessageComponent,
     ResetPasswordControlComponent,
-    SerialPipe
+    SerialPipe,
+    MyAccountComponent
   ],
   imports: [
     BrowserModule,
@@ -131,7 +140,7 @@ const routes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(routes),
     FontAwesomeModule,
-    NgbDropdownModule.forRoot(),
+    NgbDropdownModule,
     NgbModalModule,
     NgbCollapseModule,
     NgbPopoverModule

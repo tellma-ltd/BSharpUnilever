@@ -1,3 +1,66 @@
-<p>
-  user-details works!
-</p>
+<b-details controller="users"
+           masterCrumb="Users"
+           [canUpdatePred]="canUpdate"
+           [detailsCrumb]="detailsCrumb"
+           [viewEditTemplate]="editView">
+
+</b-details>
+
+<!-- Details -->
+<ng-template #detailsCrumb let-model="model">
+  <span>{{ model?.FullName }}</span>
+</ng-template>
+
+<ng-template #editView let-viewModel="viewModel" let-editModel="editModel" let-isEdit="isEdit">
+  <!-- Full Name (Header) -->
+  <div class="w-100 mb-2 mb-sm-4">
+    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ viewModel?.FullName }}</h2>
+    <div class="col-12">
+      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.FullName" required placeholder="Full Name"
+             #fullNameControl="ngModel" [class.is-invalid]="fullNameControl.invalid && fullNameControl.touched" />
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="mt-2 mt-lg-1 col-12 col-md-6">
+    <div class="row">
+      <div class="font-weight-bold small col-12 col-lg-3">
+        <span class="b-vertical-align-middle">Email</span>
+      </div>
+      <div class="col-12 col-lg-9">
+        <div *ngIf="!isEdit || !!(viewModel?.Id)">{{viewModel?.Email}}</div>
+        <input class="w-100 b-input form-control" *ngIf="isEdit && !(viewModel?.Id)" [(ngModel)]="editModel.Email" required email
+               #emailControl="ngModel" [class.is-invalid]="emailControl.invalid && emailControl.touched" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Role -->
+  <div class="mt-2 mt-lg-1 col-12 col-md-6">
+    <div class="row">
+      <div class="font-weight-bold small col-12 col-lg-3">
+        <span class="b-vertical-align-middle">Role</span>
+      </div>
+      <div class="col-12 col-lg-9">
+        <div *ngIf="!isEdit">{{viewModel?.Role}}</div>
+        <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Role" required
+               #roleControl="ngModel" [class.is-invalid]="roleControl.invalid && roleControl.touched" >
+          <option *ngFor="let role of roles" value="{{ role.value }}">{{ role.display }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- EmailConfirmed -->
+  <div class="mt-2 mt-lg-1 col-12 col-md-6">
+    <div class="row">
+      <div class="font-weight-bold small col-12 col-lg-3">
+        <span class="b-vertical-align-middle">Confirmed Email?</span>
+      </div>
+      <div class="col-12 col-lg-9">
+        <div>{{viewModel?.EmailConfirmed ? 'Yes' : 'No'}}</div>
+      </div>
+    </div>
+  </div>
+
+</ng-template>

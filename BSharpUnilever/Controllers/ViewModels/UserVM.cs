@@ -10,6 +10,7 @@ namespace BSharpUnilever.Controllers.ViewModels
 
         [Required]
         [StringLength(255)]
+        [Display(Name = "Full Name")]
         public string FullName { get; set; }
 
         [Required]
