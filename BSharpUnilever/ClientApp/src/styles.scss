@@ -39,26 +39,40 @@ a {
 
 ///////////////////////////////// BSharp /////////////////////////////////
 
+
 .b-brand {
   color: $primary;
 }
 
 .b-banner {
-  height: 100vh;
-  background-image: url('assets/images/banner.jpg');
-  background-position: 50%;
-  background-size: cover;
+  display: none;
 }
 
-.b-marketing-banner-text {
-  width: 100%;
-  color: white;
-  font-size: 3rem;
-  letter-spacing: -1px;
-  background: rgb(0, 0, 0);
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
+@media (min-width: 1200px) {
+  // This optimization ensures that the large banner image is only loaded when it is
+  // displayed on large screens, saving the bandwidth and data usage on mobile phones
+  .b-banner {
+    display: flex;
+    height: 100vh;
+    background-image: url('assets/images/banner.jpg');
+    background-position: 50%;
+    background-size: cover;
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .b-marketing-banner-text {
+    width: 100%;
+    color: white;
+    font-size: 3rem;
+    letter-spacing: -1px;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+  }
 }
+
 
 // If its parent is a column flex box, it occupies the rest of the screen
 .b-rest-of-screen {
@@ -74,7 +88,7 @@ a {
 
 // Make the primary text a little darker since easier to read
 .text-primary {
-  color: $dark-primary!important;
+  color: $dark-primary !important;
 }
 
 .b-vertical-align-middle {
@@ -105,8 +119,8 @@ a {
 }
 
 .b-toolbar {
-  padding-right: 0.125rem!important;
-  padding-left: 0.125rem!important;
+  padding-right: 0.125rem !important;
+  padding-left: 0.125rem !important;
 }
 
 .b-toolbar button {

@@ -28,7 +28,6 @@ namespace BSharpUnilever
             _config = config;
         }
 
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -41,7 +40,7 @@ namespace BSharpUnilever
                 opt.Password.RequiredLength = 7;
             })
 
-            // Providers that issue email-confirmation and password-reset tokens
+            // Providers that issue email-confirmation token and password-reset token
             .AddDefaultTokenProviders()
 
             // Register BSharpContext as the identity store

@@ -194,6 +194,11 @@ namespace BSharpUnilever.Controllers
                 var username = User.UserName();
                 var currentUser = await _userManager.FindByNameAsync(username);
 
+                if(currentUser.Role != Roles.Administrator && currentUser.Role != Roles.Manager)
+                {
+                    return Forbid();
+                }
+
                 var requests = (await ApplyRowLevelSecurityAsync(_context.SupportRequests, currentUser))
                         .Include(e => e.AccountExecutive)
                         .Include(e => e.Manager)

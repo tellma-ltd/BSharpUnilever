@@ -44,7 +44,6 @@ export function friendly(error: any) {
   return result;
 }
 
-
 export function cloneModel<T>(model: T): T {
   // This technique is simple and effective for cloning model objects, these objects
   // have to be JSON friendly anyways since they travel from/to the server
