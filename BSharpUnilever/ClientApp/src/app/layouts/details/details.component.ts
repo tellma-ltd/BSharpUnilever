@@ -63,6 +63,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
   canUpdatePred: () => boolean;
 
   @Input()
+  enableEditButtonPred: (model: any) => boolean = () => true;
+
+  @Input()
   createNew: () => any = () => ({})
 
   constructor(public modalService: NgbModal,
@@ -129,7 +132,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (this.isEdit) {
       const proceed = confirm('Your changes will be discarded, are you sure you would like to proceed?');
       if (proceed) {
-        this.onCancel();
+        // this.onCancel();
         return true;
       } else {
         return false;
@@ -206,7 +209,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   }
 
   get canEdit(): boolean {
-    return !this.canUpdatePred || this.canUpdatePred();
+    return (!this.canUpdatePred || this.canUpdatePred()) && (this.activeModel && this.enableEditButtonPred(this.activeModel));
   }
 
   onCreate(): void {

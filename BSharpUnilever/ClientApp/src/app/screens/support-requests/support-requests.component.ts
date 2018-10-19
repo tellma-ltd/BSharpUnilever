@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SupportRequest, SupportRequestReason } from '../../data/entities/SupportRequest';
+import { SupportRequest, supportRequestReasons } from '../../data/entities/SupportRequest';
 
 @Component({
   selector: 'b-support-requests',
@@ -25,6 +25,6 @@ export class SupportRequestsComponent implements OnInit {
   }
 
   getReasonDisplay(key: string): string {
-    return SupportRequestReason[key];
+    return supportRequestReasons[key];
   }
 }

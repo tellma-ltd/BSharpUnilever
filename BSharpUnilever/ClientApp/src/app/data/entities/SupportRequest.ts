@@ -9,7 +9,7 @@ export class SupportRequest {
   State: SupportRequestState;
   AccountExecutive: User;
   Manager: User;
-  Reason: SupportRequestReason;
+  Reason: 'DC' | 'PS' | 'PR' | 'FB';
   Store: Store;
   Comment: string;
   LineItems: SupportRequestLineItem[];
@@ -30,12 +30,14 @@ export enum SupportRequestState {
   Rejected = 'Rejected'
 }
 
-export enum SupportRequestReason {
-  DC = 'Display Contract',
-  PS = 'Premium Support',
-  PR = 'Price Reduction',
-  FB = 'From Balance'
-}
+const supportRequestReasons: { [key: string]: string; } = {
+  DC: 'Display Contract',
+  PS: 'Premium Support',
+  PR: 'Price Reduction',
+  FB: 'From Balance'
+};
+
+export { supportRequestReasons };
 
 export class SupportRequestLineItem {
   Id: number;
@@ -51,8 +53,8 @@ export class SupportRequestLineItem {
 
 export class StateChange {
   Id: number;
-  FromState: string;
-  ToState: string;
+  FromState: SupportRequestState;
+  ToState: SupportRequestState;
   Time: string;
   User: User;
 }

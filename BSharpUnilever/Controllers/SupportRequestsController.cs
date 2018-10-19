@@ -312,7 +312,7 @@ namespace BSharpUnilever.Controllers
 
                 // If the validation returned errors, return a 400
                 if (errors.Any())
-                    return BadRequest("The following validation errors were found:\n - " + string.Join("\n - ", errors));
+                    return BadRequest("The following validation errors were found: " + string.Join(", ", errors));
 
                 if (model.Id == 0) // Insert logic
                 {
@@ -394,7 +394,7 @@ namespace BSharpUnilever.Controllers
                         // Carry out the deferred actions 
                         foreach (var deferredAction in deferredActions)
                         {
-                            await deferredAction();
+                           // await deferredAction();
                         }
 
                         scope.Complete();
@@ -499,7 +499,7 @@ namespace BSharpUnilever.Controllers
             }
 
             // KAE cannot exceed the approved amount in the request unless it's from balance
-            if (model.Reason != Reasons.FromBalance)
+            if (model.Reason != Reasons.FromBalance && model.State == SupportRequestStates.Posted)
             {
                 var violations = model.LineItems.Where(e => e.UsedValue > e.ApprovedValue);
                 if (violations.Count() > 0)
@@ -752,22 +752,18 @@ namespace BSharpUnilever.Controllers
                         subject: $"{currentUser.FullName} has approved your request",
                         message: $"{currentUser.FullName} has approved your request");
                 }
-                else if (originalState == SupportRequestStates.Approved && newState == SupportRequestStates.Submitted)
-                {
-                    CheckUser(currentUser, newModel.AccountExecutive);
-
-                    // Email notification
-                    PushSendEmail(deferredActions,
-                        requestId: newModel.Id,
-                        recipientEmail: newModel.Manager.Email,
-                        subject: $"{currentUser.FullName} has returned the support request",
-                        message: $"{currentUser.FullName} has returned the support request that you approved");
-                }
 
                 else if (originalState == SupportRequestStates.Submitted && newState == SupportRequestStates.Rejected)
                 {
                     // (1) Check that the manager (or the admin) approved it
                     CheckUser(currentUser, newModel.Manager);
+
+                    foreach (var line in newModel.LineItems)
+                    {
+                        // Copy the values from requested to approved by default
+                        line.ApprovedSupport = 0;
+                        line.ApprovedValue = 0;
+                    }
 
                     // Email notification
                     PushSendEmail(deferredActions,
@@ -779,6 +775,13 @@ namespace BSharpUnilever.Controllers
                 else if (originalState == SupportRequestStates.Rejected && newState == SupportRequestStates.Submitted)
                 {
                     CheckUser(currentUser, newModel.Manager);
+
+                    foreach (var line in newModel.LineItems)
+                    {
+                        // Copy the values from requested to approved by default
+                        line.ApprovedSupport = line.RequestedSupport;
+                        line.ApprovedValue = line.RequestedValue;
+                    }
                 }
 
                 else if (originalState == SupportRequestStates.Approved && newState == SupportRequestStates.Posted)
@@ -901,7 +904,7 @@ namespace BSharpUnilever.Controllers
             {
                 // In a bigger app, the API should not know where the SPA lives
                 // But this is fine and convenient for now
-                string url = $"https://{Request.Host}/{Request.PathBase}support-requests/{requestId}";
+                string url = $"https://{Request.Host}/{Request.PathBase}client/support-requests/{requestId}";
 
                 // Prepare the email content
                 string htmlEmailContent = Util.Util.BSharpEmailTemplate(

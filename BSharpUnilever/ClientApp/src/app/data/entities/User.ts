@@ -2,7 +2,7 @@ export class User {
   Id: number;
   FullName: string;
   Email: string;
-  Role: string;
+  Role: 'KAE' | 'Manager' | 'Administrator' | 'Inactive';
   EmailConfirmed: boolean;
 }
 

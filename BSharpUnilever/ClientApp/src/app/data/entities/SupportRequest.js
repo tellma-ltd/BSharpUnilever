@@ -15,13 +15,13 @@ var SupportRequestState;
     SupportRequestState["Canceled"] = "Canceled";
     SupportRequestState["Rejected"] = "Rejected";
 })(SupportRequestState = exports.SupportRequestState || (exports.SupportRequestState = {}));
-var SupportRequestReason;
-(function (SupportRequestReason) {
-    SupportRequestReason["DC"] = "Display Contract";
-    SupportRequestReason["PS"] = "Premium Support";
-    SupportRequestReason["PR"] = "Price Reduction";
-    SupportRequestReason["FB"] = "From Balance";
-})(SupportRequestReason = exports.SupportRequestReason || (exports.SupportRequestReason = {}));
+var choicesSupportRequestReason = {
+    'DC': 'Display Contract',
+    'PS': 'Premium Support',
+    'PR': 'Price Reduction',
+    'FB': 'From Balance'
+};
+exports.choicesSupportRequestReason = choicesSupportRequestReason;
 var SupportRequestLineItem = /** @class */ (function () {
     function SupportRequestLineItem() {
     }

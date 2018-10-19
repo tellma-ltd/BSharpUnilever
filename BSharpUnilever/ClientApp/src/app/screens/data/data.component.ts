@@ -29,23 +29,30 @@ export class DataComponent implements OnInit, OnDestroy {
     this.data.supportrequests.getData(this.notifyDestruct$).subscribe(
       (blob: Blob) => {
         this.showSpinner = false;
+        const fileName = `Support Requests ${new Date().toDateString()}.xlsx`;
 
-        // Create an in memory url for the blob, further reading:
-        // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
-        var url = window.URL.createObjectURL(blob);
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          // To support IE and Edge
+          window.navigator.msSaveOrOpenBlob(blob, fileName);
+        } else {
 
-        // Below is a trick for downloading files without opening
-        // a new window. This is a more elegant user experience
-        var a = document.createElement('a');
-        document.body.appendChild(a);
-        a.setAttribute('style', 'display: none');
-        a.href = url;
-        a.download = `Support Requests ${new Date().toDateString()}.xlsx`;
-        a.click();
-        a.remove();
+          // Create an in memory url for the blob, further reading:
+          // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
+          var url = window.URL.createObjectURL(blob);
 
-        // Best practice to prevent a memory leak, especially in a SPA like bSharp
-        window.URL.revokeObjectURL(url);
+          // Below is a trick for downloading files without opening
+          // a new window. This is a more elegant user experience
+          var a = document.createElement('a');
+          document.body.appendChild(a);
+          a.setAttribute('style', 'display: none');
+          a.href = url;
+          a.download = fileName;
+          a.click();
+          a.remove();
+
+          // Best practice to prevent a memory leak, especially in a SPA like bSharp
+          window.URL.revokeObjectURL(url);
+        }
       },
       (friendlyError: any) => {
         this.showSpinner = false;
