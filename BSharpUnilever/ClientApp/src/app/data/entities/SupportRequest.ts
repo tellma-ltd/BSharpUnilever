@@ -37,7 +37,6 @@ export enum SupportRequestReason {
   FB = 'From Balance'
 }
 
-
 export class SupportRequestLineItem {
   Id: number;
   Product: Product;

@@ -16,18 +16,18 @@ $font-size-base: 0.9rem; // The default font (1rem) is too big
 }
 
 // Change the striped
-.table-striped tbody tr:nth-of-type(odd) {
+/*.table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.03);
-}
+}*/
 
 // This solves a problem in responsive tables that contain dropdowns
-@media (max-width: 767px) {
+@media only screen and (max-width: 767px) {
   .table-responsive .dropdown-menu {
     position: static !important;
   }
 }
 
-@media (min-width: 768px) {
+@media only screen and (min-width: 768px) {
   .table-responsive {
     overflow: visible;
   }
@@ -39,7 +39,6 @@ a {
 
 ///////////////////////////////// BSharp /////////////////////////////////
 
-
 .b-brand {
   color: $primary;
 }
@@ -48,7 +47,7 @@ a {
   display: none;
 }
 
-@media (min-width: 1200px) {
+@media only screen and (min-width: 1200px) {
   // This optimization ensures that the large banner image is only loaded when it is
   // displayed on large screens, saving the bandwidth and data usage on mobile phones
   .b-banner {
@@ -139,6 +138,7 @@ a {
 
 .b-input {
   border-width: 0 0 1px 0;
+  border-color: gray;
   background-color: transparent;
   padding: 0 !important;
   height: auto;
@@ -170,9 +170,130 @@ a {
   animation-delay: 0.1s;
 }
 
-// Edge browser shows a little X button in input fieldthat lets you
-// clear it field, but this button doesn't seem to signal angular
-// ngModel to update the model, so we simply hide the X button here
+// Edge browser shows a little X button in input field that lets you
+// clear that field, but this button doesn't seem to signal angular's
+// ngModel to update the model, here we simply hide that X button
 input::-ms-clear {
   display: none;
+}
+
+// The below code styles the state flow chart, credit goes to
+// this gentleman: https://css-tricks.com/triangle-breadcrumbs/
+$flow-state-active: #f8f9fa;
+$flow-border: #dee2e6;
+$flow-state: white;
+$flow-text: #6c757d;
+
+.b-flow-chart {
+  overflow: hidden;
+  margin-right: -0.125rem !important;
+  border-left: 1px solid $flow-border;
+}
+
+.b-flow-chart div {
+  float: left;
+}
+
+.b-flow-chart div span {
+  color: $flow-text;
+  padding: 10px 0 10px 50px;
+  background-color: $flow-state;
+  position: relative;
+  display: block;
+  float: left;
+}
+
+.b-flow-chart div:first-child span {
+  padding-left: 25px;
+}
+
+.b-flow-chart div:last-child span {
+  padding-right: 25px;
+}
+
+.b-flow-chart div span::after {
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+  border-left: 30px solid $flow-state;
+  position: absolute;
+  top: 50%;
+  margin-top: -50px;
+  left: 100%;
+  z-index: 2;
+}
+
+.b-flow-chart div span::before {
+  content: " ";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+  border-left: 30px solid $flow-border;
+  position: absolute;
+  top: 50%;
+  margin-top: -50px;
+  margin-left: 1px;
+  left: 100%;
+  z-index: 1;
+}
+
+
+.b-lone-state {
+  border-left: 1px solid $flow-border;
+  margin-right: -0.125rem !important;
+  padding: 10px 20px;
+}
+
+.b-lone-state span {
+  color: $flow-text;
+}
+
+.b-flow-chart div.active span, .b-lone-state.active {
+  background-color: $flow-state-active;
+  font-weight: bold;
+}
+
+.b-flow-chart div.active span::after {
+  border-left-color: $flow-state-active;
+}
+
+// Set the layout for the main document and the sidebar
+// on large screens, show them side by side, on smaller
+// screens show them stacked vertically
+.b-main-and-side {
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.b-sidebar {
+  width: 100% !important;
+  border-top: 1px solid $flow-border;
+  flex: 1 0;
+  height: 100%;
+}
+
+@media only screen and (min-width: 1534px) {
+
+  .b-main-and-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .b-main-document {
+    width: 67% !important;
+    overflow-y: auto;
+  }
+
+  .b-sidebar {
+    width: 33% !important;
+    border-top: none;
+    border-left: 1px solid $flow-border;
+    margin-left: -1px;
+    overflow-y: auto;
+  }
 }

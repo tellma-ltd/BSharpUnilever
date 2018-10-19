@@ -12,7 +12,7 @@
         </li>
         <li class="breadcrumb-item active">
           <ng-container *ngIf="(!showSpinner); else loading">
-            <ng-container *ngTemplateOutlet="detailsCrumb; context: { model: viewModel }">
+            <ng-container *ngTemplateOutlet="detailsCrumb; context: { model: activeModel }">
             </ng-container>
           </ng-container>
           <ng-template #loading>Loading...</ng-template>
@@ -63,17 +63,24 @@
         </button>
       </div>
     </div>
+
+
   </div>
 
   <!-- Content Area -->
-  <div class="row b-rest-of-screen bg-light border-top">
-    <div class="w-100">
+  <div class="row b-rest-of-screen bg-light" [class.b-main-and-side]="!!sidebarTemplate">
+    <div class="w-100" [class.b-main-document]="!!sidebarTemplate">
+      <!-- Second toolbar -->
+      <div *ngIf="!!secondToolbarTemplate && showViewEdit" class="col-12 border-left border-right border-bottom bg-white w-100 b-toolbar">
+        <ng-container *ngTemplateOutlet="secondToolbarTemplate;context: { model: activeModel, isEdit: isEdit }">
+        </ng-container>
+      </div>
 
       <!-- View/Edit Document -->
-      <div class="p-0 p-sm-3 d-flex flex-column align-items-center" *ngIf="showViewEdit">
+      <div class="p-0 p-sm-3 d-flex flex-column align-items-center border-top" *ngIf="showViewEdit">
         <div class="border bg-white w-100 b-paper" (dblclick)="onDblClick()">
           <div class="row m-0 pl-1 pl-sm-3 pr-1 pr-sm-3 pt-3 pt-sm-4 pb-3 pb-sm-5">
-            <ng-container *ngTemplateOutlet="viewEditTemplate;context: { viewModel: viewModel, editModel: editModel, isEdit: isEdit }">
+            <ng-container *ngTemplateOutlet="viewEditTemplate;context: { model: activeModel, isEdit: isEdit }">
             </ng-container>
           </div>
         </div>
@@ -92,6 +99,11 @@
           {{ errorMessage }}
         </b-error-message>
       </div>
+    </div>
+
+    <div *ngIf="!!sidebarTemplate && showViewEdit" class="b-sidebar bg-white">
+      <ng-container *ngTemplateOutlet="sidebarTemplate;context: { model: activeModel, isEdit: isEdit }">
+      </ng-container>
     </div>
   </div>
 </div>

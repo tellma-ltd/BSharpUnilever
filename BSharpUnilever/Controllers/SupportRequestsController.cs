@@ -47,7 +47,7 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SupportRequestVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
+        public async Task<ActionResult<ListResultVM<SupportRequestVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
             int skip = 0, string orderby = nameof(SupportRequestVM.SerialNumber), bool desc = true, string search = null)
         {
             try
@@ -56,7 +56,8 @@ namespace BSharpUnilever.Controllers
                 IQueryable<SupportRequest> query = _context.SupportRequests.AsNoTracking();
 
                 // Apply row level security: if you are a KAE you only see your records
-                query = await ApplyRowLevelSecurityAsync(query);
+                var user = await GetCurrentUserAsync();
+                query = await ApplyRowLevelSecurityAsync(query, user);
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
@@ -76,6 +77,7 @@ namespace BSharpUnilever.Controllers
                         // ELSE search KAE and store names and comments
                         query = query.Where(e =>
                         e.AccountExecutive.FullName.Contains(search) ||
+                        e.Manager.FullName.Contains(search) ||
                         e.Store.Name.Contains(search) ||
                         e.Comment.Contains(search));
                     }
@@ -113,6 +115,13 @@ namespace BSharpUnilever.Controllers
                     TotalCount = totalCount,
                     Data = resultData
                 };
+
+                // If the user is a KAE, also send his/her balance in the dynamic bag
+                if (user.Role == Roles.KAE)
+                {
+                    result.Bag = new Dictionary<string, object>();
+                    result.Bag["AvailableBalance"] = CurrentAvailableBalance(user);
+                }
 
                 // Finally return the result
                 return Ok(result);
@@ -194,7 +203,7 @@ namespace BSharpUnilever.Controllers
                 var username = User.UserName();
                 var currentUser = await _userManager.FindByNameAsync(username);
 
-                if(currentUser.Role != Roles.Administrator && currentUser.Role != Roles.Manager)
+                if (currentUser.Role != Roles.Administrator && currentUser.Role != Roles.Manager)
                 {
                     return Forbid();
                 }
@@ -218,7 +227,7 @@ namespace BSharpUnilever.Controllers
                         var cells = p.Workbook.Worksheets.Add("Support Requests").Cells;
                         int row = 1;
                         int col = 1;
-                        var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c+"").ToArray();
+                        var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c + "").ToArray();
 
                         /////// Set all the header labels and the column styles
                         cells[cols[col] + row].Value = "Date";
@@ -377,7 +386,7 @@ namespace BSharpUnilever.Controllers
                         }
                     }
 
-                    using (var scope = new TransactionScope())
+                    using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                     {
                         // Save the changes
                         await _context.SaveChangesAsync();
@@ -935,7 +944,9 @@ namespace BSharpUnilever.Controllers
         {
             // The requirement is that Key account executives can only see their own requests
             if (user == null)
+            {
                 user = await GetCurrentUserAsync();
+            }
 
             if (user.Role == Roles.KAE)
             {

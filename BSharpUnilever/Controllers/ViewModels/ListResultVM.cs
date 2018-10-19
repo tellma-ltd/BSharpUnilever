@@ -17,6 +17,8 @@ namespace BSharpUnilever.Controllers.ViewModels
 
         public int TotalCount { get; set; }
 
+        public Dictionary<string, object> Bag { get; set; }
+
         public List<T> Data { get; set; }
     }
 }

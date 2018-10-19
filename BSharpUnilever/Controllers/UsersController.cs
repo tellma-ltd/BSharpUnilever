@@ -43,7 +43,7 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<UserVM>> GetAll(int top = DEFAULT_PAGE_SIZE, int skip = 0,
+        public ActionResult<ListResultVM<UserVM>> GetAll(int top = DEFAULT_PAGE_SIZE, int skip = 0,
                                                         string orderby = nameof(UserVM.FullName),
                                                         bool desc = false, string search = null)
         {

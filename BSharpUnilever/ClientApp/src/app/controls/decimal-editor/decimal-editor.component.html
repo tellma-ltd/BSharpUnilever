@@ -1,5 +1,5 @@
 <input class="form-control b-input" type="text"
-       style="text-align:right"
+       [style.text-align]="leftAlign ? 'left' : 'right'"
        #input
        (input)="onChange($event.target.value)"
        (blur)="onTouched(); onBlur($event.target.value);"

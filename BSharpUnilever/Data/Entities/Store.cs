@@ -14,7 +14,6 @@ namespace BSharpUnilever.Data.Entities
         [MaxLength(255)]
         public string Name { get; set; }
 
-        [Required]
         public string AccountExecutiveId { get; set; }
 
         public User AccountExecutive { get; set; }

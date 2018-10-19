@@ -51,7 +51,13 @@ export class DetailsComponent implements OnInit, OnDestroy {
   detailsCrumb: TemplateRef<any>;
 
   @Input()
+  secondToolbarTemplate: TemplateRef<any>;
+
+  @Input()
   viewEditTemplate: TemplateRef<any>;
+
+  @Input()
+  sidebarTemplate: TemplateRef<any>;
 
   @Input()
   canUpdatePred: () => boolean;
@@ -93,7 +99,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
   private doFetch(): Observable<void> {
     if (this.id === 'new') {
       // IF it's create new, don't fetch anything
-      this._viewModel = null;
       this._editModel = this.createNew();
       this.detailsStatus = DetailsStatus.edit;
 
@@ -134,7 +139,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private showModalError(errorMessage: string) {
+  public showModalError(errorMessage: string) {
     // Shows the error message in a dismissable modal
     this._modalErrorMessage = errorMessage;
     this.modalService.open(this.errorModal);
@@ -154,8 +159,16 @@ export class DetailsComponent implements OnInit, OnDestroy {
     return this._viewModel;
   }
 
+  set viewModel(val: any) {
+    this._viewModel = val;
+  }
+
   get editModel() {
     return this._editModel;
+  }
+
+  get activeModel() {
+    return this.isEdit ? this.editModel : this.viewModel;
   }
 
   get showSpinner(): boolean {

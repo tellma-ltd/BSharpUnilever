@@ -14,7 +14,6 @@ namespace BSharpUnilever.Controllers.ViewModels
         [StringLength(255)]
         public string Name { get; set; }
 
-        [Required]
         public UserVM AccountExecutive { get; set; }
 
         public bool IsActive { get; set; }

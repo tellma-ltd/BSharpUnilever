@@ -93,7 +93,7 @@ export class DetailsPickerComponent implements AfterViewInit, OnDestroy, Control
           return of([]);
         } else {
           this.status = SearchStatus.showSpinner;
-          return this.data.users.getAll(this.SEARCH_PAGE_SIZE, 0, 'Id', false, term, this.cancelRunningCall$).pipe(
+          return this.data[this.controller].getAll(this.SEARCH_PAGE_SIZE, 0, 'Id', false, term, this.cancelRunningCall$).pipe(
             tap(() => this.status = SearchStatus.showResults),
             map((res: ListResult<any>) => res.Data),
             catchError(() => {
@@ -103,7 +103,7 @@ export class DetailsPickerComponent implements AfterViewInit, OnDestroy, Control
           );
         }
       })
-    ).subscribe(results => {
+    ).subscribe((results: any[]) => {
       // Populate the dropdown with the results
       this._searchResults = results;
 

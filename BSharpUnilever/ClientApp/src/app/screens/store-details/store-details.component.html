@@ -12,12 +12,12 @@
 </ng-template>
 
 <!-- Edit/View Template -->
-<ng-template #editView let-viewModel="viewModel" let-editModel="editModel" let-isEdit="isEdit">
+<ng-template #editView let-model="model" let-isEdit="isEdit">
   <!-- Name (Header) -->
   <div class="w-100 mb-2 mb-sm-4">
-    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ viewModel?.Name }}</h2>
+    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ model?.Name }}</h2>
     <div class="col-12">
-      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Name" placeholder="Name" required
+      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.Name" placeholder="Name" required
              #nameControl="ngModel" [class.is-invalid]="nameControl.invalid && nameControl.touched" />
     </div>
   </div>
@@ -29,8 +29,8 @@
         <span class="b-vertical-align-middle">Key Account Executive</span>
       </div>
       <div class="col-12 col-lg-8">
-        <a *ngIf="!isEdit" [routerLink]="['../../users', viewModel?.AccountExecutive?.Id]">{{viewModel?.AccountExecutive?.FullName}}</a>
-        <b-details-picker *ngIf="isEdit" [(ngModel)]="editModel.AccountExecutive" controller="users" [formatter]="userFormatter" required
+        <a *ngIf="!isEdit" [routerLink]="['../../users', model?.AccountExecutive?.Id]">{{model?.AccountExecutive?.FullName}}</a>
+        <b-details-picker *ngIf="isEdit" [(ngModel)]="model.AccountExecutive" controller="users" [formatter]="userFormatter" required
                           #accountExecControl="ngModel" [class.is-invalid]="accountExecControl.invalid && accountExecControl.touched">
         </b-details-picker>
       </div>
@@ -45,8 +45,8 @@
         <span class="b-vertical-align-middle">Is Active?</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.IsActive ? 'Yes' : 'No'}}</div>
-        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsActive"
+        <div *ngIf="!isEdit">{{model?.IsActive ? 'Yes' : 'No'}}</div>
+        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="model.IsActive"
                #isActiveControl="ngModel" [class.is-invalid]="isActiveControl.invalid && isActiveControl.touched" />
       </div>
     </div>

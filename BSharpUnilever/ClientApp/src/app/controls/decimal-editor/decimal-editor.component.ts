@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -15,6 +15,9 @@ export class DecimalEditorComponent implements ControlValueAccessor {
   ///////////////// Implementation of ControlValueAccessor
   @ViewChild('input')
   input: ElementRef;
+
+  @Input()
+  leftAlign = false;
 
   onChange: (val: any) => void;
   onTouched: () => void;

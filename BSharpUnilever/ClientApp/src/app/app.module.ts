@@ -56,7 +56,12 @@ import {
   faTrashAlt,
   faSave,
   faTimes,
-  faDownload
+  faDownload,
+  faArrowCircleRight,
+  faThumbsUp,
+  faThumbsDown,
+  faUndo,
+  faClipboardCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { GlobalsResolverService } from './data/globals-resolver.service';
 import { SerialPipe } from './misc/serial.pipe';
@@ -68,7 +73,9 @@ library.add(
   faExclamationTriangle, faSpinner, faSignInAlt, faSignOutAlt,
   faKey, faCheck, faPlus, faSyncAlt, faAngleDoubleLeft,
   faAngleLeft, faAngleRight, faThLarge, faList, faEdit, faTrashAlt,
-  faSave, faTimes, faDownload
+  faSave, faTimes, faDownload, faArrowCircleRight, faThumbsUp, faThumbsDown,
+  faUndo, faClipboardCheck
+
 );
 
 // Routing configuration

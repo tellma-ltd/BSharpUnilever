@@ -12,12 +12,12 @@
 </ng-template>
 
 <!-- Edit/View Template -->
-<ng-template #editView let-viewModel="viewModel" let-editModel="editModel" let-isEdit="isEdit">
+<ng-template #editView let-model="model" let-isEdit="isEdit">
   <!-- Description (Header) -->
   <div class="w-100 mb-2 mb-sm-4">
-    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ viewModel?.Description }}</h2>
+    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ model?.Description }}</h2>
     <div class="col-12">
-      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Description" required placeholder="Description"
+      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.Description" required placeholder="Description"
              #descControl="ngModel" [class.is-invalid]="descControl.invalid && descControl.touched" />
     </div>
   </div>
@@ -29,8 +29,8 @@
         <span class="b-vertical-align-middle">Barcode</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.Barcode}}</div>
-        <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Barcode" required
+        <div *ngIf="!isEdit">{{model?.Barcode}}</div>
+        <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.Barcode" required
                #barcodeControl="ngModel" [class.is-invalid]="barcodeControl.invalid && barcodeControl.touched" />
       </div>
     </div>
@@ -43,8 +43,8 @@
         <span class="b-vertical-align-middle">SAP Material Code</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.SapCode}}</div>
-        <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.SapCode" required
+        <div *ngIf="!isEdit">{{model?.SapCode}}</div>
+        <input class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.SapCode" required
                #sapCodeControl="ngModel" [class.is-invalid]="sapCodeControl.invalid && sapCodeControl.touched" />
       </div>
     </div>
@@ -57,8 +57,8 @@
         <span class="b-vertical-align-middle">Type</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{ typeDisplay(viewModel?.Type) }}</div>
-        <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Type" required
+        <div *ngIf="!isEdit">{{ typeDisplay(model?.Type) }}</div>
+        <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.Type" required
                 #typeControl="ngModel" [class.is-invalid]="typeControl.invalid && typeControl.touched">
           <option *ngFor="let type of types" value="{{ type.value }}">{{ type.display }}</option>
         </select>
@@ -73,8 +73,8 @@
         <span class="b-vertical-align-middle">Is Promo?</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.IsPromo ? 'Yes' : 'No'}}</div>
-        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsPromo"
+        <div *ngIf="!isEdit">{{model?.IsPromo ? 'Yes' : 'No'}}</div>
+        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="model.IsPromo"
                #isPromoControl="ngModel" [class.is-invalid]="isPromoControl.invalid && isPromoControl.touched" />
       </div>
     </div>
@@ -87,8 +87,8 @@
         <span class="b-vertical-align-middle">Is Active?</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.IsActive ? 'Yes' : 'No'}}</div>
-        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="editModel.IsActive"
+        <div *ngIf="!isEdit">{{model?.IsActive ? 'Yes' : 'No'}}</div>
+        <input type="checkbox" *ngIf="isEdit" [(ngModel)]="model.IsActive"
                #isActiveControl="ngModel" [class.is-invalid]="isActiveControl.invalid && isActiveControl.touched" />
       </div>
     </div>

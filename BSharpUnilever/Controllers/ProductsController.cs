@@ -34,7 +34,7 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
+        public async Task<ActionResult<ListResultVM<ProductVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
             int skip = 0, string orderby = nameof(ProductVM.Id), bool desc = false, string search = null)
         {
             try

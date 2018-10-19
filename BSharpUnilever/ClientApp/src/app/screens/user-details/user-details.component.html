@@ -11,12 +11,12 @@
   <span>{{ model?.FullName }}</span>
 </ng-template>
 
-<ng-template #editView let-viewModel="viewModel" let-editModel="editModel" let-isEdit="isEdit">
+<ng-template #editView let-model="model" let-isEdit="isEdit">
   <!-- Full Name (Header) -->
   <div class="w-100 mb-2 mb-sm-4">
-    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ viewModel?.FullName }}</h2>
+    <h2 class="col-12 font-weight-normal" *ngIf="!isEdit">{{ model?.FullName }}</h2>
     <div class="col-12">
-      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.FullName" required placeholder="Full Name"
+      <input class="w-100 b-h2 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.FullName" required placeholder="Full Name"
              #fullNameControl="ngModel" [class.is-invalid]="fullNameControl.invalid && fullNameControl.touched" />
     </div>
   </div>
@@ -28,8 +28,8 @@
         <span class="b-vertical-align-middle">Email</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit || !!(viewModel?.Id)">{{viewModel?.Email}}</div>
-        <input class="w-100 b-input form-control" *ngIf="isEdit && !(viewModel?.Id)" [(ngModel)]="editModel.Email" required email
+        <div *ngIf="!isEdit || !!(model?.Id)">{{model?.Email}}</div>
+        <input class="w-100 b-input form-control" *ngIf="isEdit && !(model?.Id)" [(ngModel)]="model.Email" required email
                #emailControl="ngModel" [class.is-invalid]="emailControl.invalid && emailControl.touched" />
       </div>
     </div>
@@ -42,8 +42,8 @@
         <span class="b-vertical-align-middle">Role</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div *ngIf="!isEdit">{{viewModel?.Role}}</div>
-        <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="editModel.Role" required
+        <div *ngIf="!isEdit">{{model?.Role}}</div>
+        <select class="w-100 b-input form-control" *ngIf="isEdit" [(ngModel)]="model.Role" required
                #roleControl="ngModel" [class.is-invalid]="roleControl.invalid && roleControl.touched" >
           <option *ngFor="let role of roles" value="{{ role.value }}">{{ role.display }}</option>
         </select>
@@ -58,7 +58,7 @@
         <span class="b-vertical-align-middle">Confirmed Email?</span>
       </div>
       <div class="col-12 col-lg-8">
-        <div>{{viewModel?.EmailConfirmed ? 'Yes' : 'No'}}</div>
+        <div>{{model?.EmailConfirmed ? 'Yes' : 'No'}}</div>
       </div>
     </div>
   </div>
