@@ -51,6 +51,11 @@ namespace BSharpUnilever.Data
             builder.Entity<Store>().
                 HasOne(e => e.AccountExecutive)
                 .WithMany(e => e.AssignedStores).OnDelete(DeleteBehavior.Restrict);
+
+            // This ensures that 2 documents will never have the same serial number
+            builder.Entity<SupportRequest>()
+            .HasIndex(b => b.SerialNumber)
+            .IsUnique();
         }
     }
 }

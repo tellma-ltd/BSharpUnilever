@@ -10,6 +10,7 @@ namespace BSharpUnilever.Controllers.ViewModels
     {
         public int Id { get; set; }
 
+        [Display(Name = "Created On")]
         public DateTime? Date { get; set; }
 
         public int? SerialNumber { get; set; }

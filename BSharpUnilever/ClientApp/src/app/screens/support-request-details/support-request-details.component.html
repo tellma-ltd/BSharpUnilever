@@ -101,7 +101,7 @@
   <div class="mt-2 mt-lg-1 col-12 col-md-6">
     <div class="row">
       <div class="font-weight-bold small col-12 col-lg-4">
-        <span class="b-vertical-align-middle">Date</span>
+        <span class="b-vertical-align-middle">Created On</span>
       </div>
       <div class="col-12 col-lg-8">
         <div>{{model?.Date | date }}</div>
@@ -237,7 +237,8 @@
     <table class="table table-sm table-striped mb-2 mb-sm-0">
       <thead class="small thead-light2">
         <tr>
-          <th style="width:23%">Product</th>
+          <th style="width:27%">Product</th>
+          <th style="width:13%">Barcode</th>
           <th class="text-right">Quantity</th>
           <th class="text-right" *ngIf="isVisibleRequestedSupport(model)">Requested Support</th>
           <th class="text-right" *ngIf="isVisibleRequestedValue(model)">Requested Value</th>
@@ -249,7 +250,7 @@
         </tr>
       </thead>
       <tbody class="border-bottom">
-        <tr *ngFor="let li of model.LineItems; let i = index">
+        <tr *ngFor="let li of model.LineItems; let i = index" >
           <td>
             <a *ngIf="(!isEdit || !isDraft(model)) && !!li.Product?.Id" [routerLink]="['../../products', li.Product?.Id]">{{ li.Product?.Description }}</a>
             <b-details-picker *ngIf="isEdit && isDraft(model)" [(ngModel)]="li.Product" name="product_{{i}}" controller="products" [formatter]="productFormatter" required
@@ -257,7 +258,9 @@
                               [focusIf]="(i === model.LineItems.length-1) && !!li.isNew">
             </b-details-picker>
           </td>
-
+          <td>
+            <span>{{ li.Product?.Barcode }}</span>
+          </td>
           <td class="text-right">
             <span *ngIf="!isEdit || !isDraft(model)">{{ li.Quantity | number:'1.2-2' }}</span>
             <span *ngIf="isEdit && isDraft(model)"><b-decimal-editor required [(ngModel)]="li.Quantity" (ngModelChange)="onQuantityChange(li)"></b-decimal-editor></span>
@@ -305,7 +308,7 @@
           <td class="font-italic font-weight-light text-muted" colspan="1000">No items to display.</td>
         </tr>
         <tr *ngIf="isEdit">
-          <td colspan="1000"><button type="button" class="btn btn-link text-primary p-0 border-0" (focus)="onAddLine(model)">Add a line...</button></td>
+          <td colspan="1000">&nbsp;<button class="btn btn-link text-primary p-0 border-0" type="button" (focus)="onAddLine(model)" *ngIf="isDraft(model)">Add a line...</button></td>
         </tr>
         <tr *ngIf="model.LineItems?.length < (isEdit ? 1 : 2)">
           <td colspan="1000">&nbsp;</td>
@@ -327,7 +330,7 @@
         <div class="m-1" style="float:left" *ngFor="let cn of model.GeneratedDocuments; let i = index">
           <button class="btn btn-primary" [disabled]="cn.State < 0" (click)="onDownloadCreditNote(cn)">
             <s *ngIf="cn.State < 0">{{ cn.SerialNumber | bSerial:'CN' }}</s>
-            <span *ngIf="cn.State === 0"><fa-icon icon="download"></fa-icon>&nbsp;&nbsp;{{ cn.SerialNumber | bSerial:'CN' }}</span>
+            <span *ngIf="cn.State === 0"><fa-icon icon="download"></fa-icon>&nbsp;&nbsp;{{ cn.SerialNumber | bSerial:'CN' }} ({{ cn.Date | date }})</span>
           </button>
         </div>
         <div class="btn m-1" *ngIf="showSpinner">

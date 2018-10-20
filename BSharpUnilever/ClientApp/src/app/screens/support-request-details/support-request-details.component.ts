@@ -110,6 +110,11 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     lineItems.splice(index, 1);
   }
 
+  onFocusOut(li: SupportRequestLineItem) {
+    // if(!li.Product && !li.Quantity)
+    console.log('Focus Out!');
+  }
+
   isVisibleSubmit(model: SupportRequest): boolean {
     const currentRole = this.globals.currentUser.Role;
     return !!model.Id &&

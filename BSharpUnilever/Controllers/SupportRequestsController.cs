@@ -224,6 +224,7 @@ namespace BSharpUnilever.Controllers
                 }
 
                 var requests = (await ApplyRowLevelSecurityAsync(_context.SupportRequests, currentUser))
+                        .Where(e => e.State != SupportRequestStates.Canceled)
                         .Include(e => e.AccountExecutive)
                         .Include(e => e.Manager)
                         .Include(e => e.Store)
@@ -245,7 +246,7 @@ namespace BSharpUnilever.Controllers
                         var cols = "_ABCDEFGHIJKLMNOPQRSTUVWXYZ".Select(c => c + "").ToArray();
 
                         /////// Set all the header labels and the column styles
-                        cells[cols[col] + row].Value = "Date";
+                        cells[cols[col] + row].Value = "Created On";
                         cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "yyyy-mm-dd";
                         col++;
 
@@ -258,11 +259,50 @@ namespace BSharpUnilever.Controllers
                         cells[cols[col] + row].Value = "Store";
                         col++;
 
-                        cells[cols[col] + row].Value = "Value";
+                        cells[cols[col] + row].Value = "Key Account Executive";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Manager";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Reason";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Product";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Product Barcode";
+                        col++;
+
+                        cells[cols[col] + row].Value = "SAP Material Code";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Product Type";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Promo?";
+                        col++;
+
+                        cells[cols[col] + row].Value = "Quantity";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "#,##0";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        col++;
+
+                        cells[cols[col] + row].Value = "Requested Value (AED)";
                         cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "#,##0.00";
                         cells[$"{cols[col]}:{cols[col]}"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                         col++;
 
+                        cells[cols[col] + row].Value = "Approved Value (AED)";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "#,##0.00";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        col++;
+
+                        cells[cols[col] + row].Value = "Used Value (AED)";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.Numberformat.Format = "#,##0.00";
+                        cells[$"{cols[col]}:{cols[col]}"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        col++;
+                        
                         /////// Populate the data
                         foreach (var line in requestLines)
                         {
@@ -282,7 +322,44 @@ namespace BSharpUnilever.Controllers
                             // Store
                             cells[cols[col++] + row].Value = line.SupportRequest.Store?.Name;
 
-                            // Value
+                            // Key Account Executive
+                            cells[cols[col++] + row].Value = line.SupportRequest.AccountExecutive?.FullName;
+
+                            // Manager
+                            cells[cols[col++] + row].Value = line.SupportRequest.Manager?.FullName;
+
+                            // Reason
+                            cells[cols[col++] + row].Value =
+                                line.SupportRequest.Reason == Reasons.DisplayContract ? "Display Contract" :
+                                line.SupportRequest.Reason == Reasons.PremiumSupport ? "Premium Support" :
+                                line.SupportRequest.Reason == Reasons.PriceReduction ? "Price Reduction" :
+                                line.SupportRequest.Reason == Reasons.FromBalance ? "From Balance" : "";
+
+                            // Product
+                            cells[cols[col++] + row].Value = line.Product?.Description;
+
+                            // Product Barcode
+                            cells[cols[col++] + row].Value = line.Product?.Barcode;
+
+                            // SAP Material Code
+                            cells[cols[col++] + row].Value = line.Product?.SapCode;
+
+                            // Product Type
+                            cells[cols[col++] + row].Value = line.Product?.Type;
+
+                            // Promo?
+                            cells[cols[col++] + row].Value = line.Product == null ? "" : line.Product.IsPromo ? "Promo" : "Regular";
+
+                            // Quantity
+                            cells[cols[col++] + row].Value = line.Quantity;
+
+                            // Requested Value
+                            cells[cols[col++] + row].Value = line.RequestedValue;
+
+                            // Approved Value
+                            cells[cols[col++] + row].Value = line.ApprovedValue;
+
+                            // Used Value
                             cells[cols[col++] + row].Value = line.UsedValue;
                         }
 
@@ -481,6 +558,9 @@ namespace BSharpUnilever.Controllers
 
             if (model.Reason == Reasons.PriceReduction)
             {
+                model.LineItems.RemoveAll(e => e.Product == null && e.Quantity == 0 &&
+                e.RequestedSupport == 0 && e.ApprovedSupport == 0 && e.UsedSupport == 0);
+
                 // At least one item is mandatory
                 if (!model.LineItems.Any())
                 {
@@ -565,7 +645,6 @@ namespace BSharpUnilever.Controllers
             newModel.Created = oldModel.Created;
             newModel.SerialNumber = oldModel.SerialNumber;
             newModel.Date = oldModel.Date;
-
 
             // The list of non-transactional actions to be executed at the end
             List<Func<Task>> deferredActions = new List<Func<Task>>();
@@ -886,12 +965,13 @@ namespace BSharpUnilever.Controllers
                 {
                     CheckUser(currentUser, newModel.AccountExecutive);
 
-                    // (3) Email notification
-                    PushSendEmail(deferredActions,
-                        requestId: newModel.Id,
-                        recipientEmail: newModel.AccountExecutive.Email,
-                        subject: $"{currentUser.FullName} has returned your support amount",
-                        message: $"{currentUser.FullName} has returned the support amount");
+                    // This is questionable...
+                    //// (3) Email notification
+                    //PushSendEmail(deferredActions,
+                    //    requestId: newModel.Id,
+                    //    recipientEmail: newModel.Manager.Email,
+                    //    subject: $"{currentUser.FullName} has returned a support request that you previously approved",
+                    //    message: $"{currentUser.FullName} has returned a support request that you previously approved");
                 }
                 else
                 {
