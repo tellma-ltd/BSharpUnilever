@@ -40,6 +40,9 @@ export class MasterComponent implements OnInit, OnDestroy {
   public tableRowTemplate: TemplateRef<any>;
 
   @Input()
+  public toolbarExtrasTemplate: TemplateRef<any>;
+
+  @Input()
   public tableDefinition: { display: string, orderBy?: string }[];
 
   @Input()
@@ -52,6 +55,7 @@ export class MasterComponent implements OnInit, OnDestroy {
   private _total = 0;
   private _orderBy: string = null;
   private _desc = true;
+  private _bag: { [key: string]: any };
   private _masterData = [];
   private masterStatus: MasterStatus;
   private _errorMessage: string = null;
@@ -115,7 +119,8 @@ export class MasterComponent implements OnInit, OnDestroy {
       this.orderBy,
       this._desc,
       this.search,
-      this.notifyDestruct$
+      this.notifyDestruct$,
+      true // include inactive
     ).pipe(
       tap((result: ListResult<any>) => {
 
@@ -126,6 +131,7 @@ export class MasterComponent implements OnInit, OnDestroy {
         this._desc = result.Desc;
         this._total = result.TotalCount;
         this._masterData = result.Data;
+        this._bag = result.Bag;
       }),
       catchError((friendlyError) => {
         this.masterStatus = MasterStatus.error;
@@ -191,6 +197,10 @@ export class MasterComponent implements OnInit, OnDestroy {
 
   get total(): number {
     return this._total;
+  }
+
+  get bag(): any {
+    return this._bag;
   }
 
   onFirstPage() {

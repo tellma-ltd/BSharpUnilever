@@ -297,7 +297,7 @@
           </td>
 
           <td *ngIf="isEdit" style="width:1px">
-            <fa-icon class="text-danger b-pointer" icon="trash-alt" (click)="deleteLine(i, model)" title="Delete"></fa-icon>
+            <fa-icon class="text-danger b-pointer" icon="trash-alt" (click)="onDeleteLine(i, model)" title="Delete"></fa-icon>
 
           </td>
         </tr>
@@ -305,7 +305,7 @@
           <td class="font-italic font-weight-light text-muted" colspan="1000">No items to display.</td>
         </tr>
         <tr *ngIf="isEdit">
-          <td colspan="1000"><button type="button" class="btn btn-link text-primary p-0 border-0" (focus)="addLine(model)">Add a line...</button></td>
+          <td colspan="1000"><button type="button" class="btn btn-link text-primary p-0 border-0" (focus)="onAddLine(model)">Add a line...</button></td>
         </tr>
         <tr *ngIf="model.LineItems?.length < (isEdit ? 1 : 2)">
           <td colspan="1000">&nbsp;</td>
@@ -316,11 +316,28 @@
       </tbody>
     </table>
   </div>
-
-
 </ng-template>
 
 <!-- Sidebar -->
 <ng-template #sidebar let-model="model" let-isEdit="isEdit">
-  <div></div>
+  <div class="d-flex justify-content-center" *ngIf="!!model.GeneratedDocuments && model.GeneratedDocuments.length > 0">
+    <div class="w-100 b-paper">
+      <div class="row m-0 pl-1 pl-sm-3 pr-1 pr-sm-3 pt-3 pt-sm-4 pb-3 pb-sm-5">
+        <h6 class="col-12">Generated Credit Note: </h6>
+        <div class="m-1" style="float:left" *ngFor="let cn of model.GeneratedDocuments; let i = index">
+          <button class="btn btn-primary" [disabled]="cn.State < 0" (click)="onDownloadCreditNote(cn)">
+            <s *ngIf="cn.State < 0">{{ cn.SerialNumber | bSerial:'CN' }}</s>
+            <span *ngIf="cn.State === 0">{{ cn.SerialNumber | bSerial:'CN' }}</span>
+          </button>
+        </div>
+        <div class="btn m-1" *ngIf="showSpinner">
+          <span>
+            <b-spinner></b-spinner>&nbsp;&nbsp;Downloading...
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </ng-template>

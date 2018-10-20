@@ -16,7 +16,7 @@ namespace BSharpUnilever.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "Active")]
     public class StoresController : ControllerBase
     {
         private const int DEFAULT_PAGE_SIZE = 50;
@@ -35,19 +35,25 @@ namespace BSharpUnilever.Controllers
 
         [HttpGet]
         public async Task<ActionResult<ListResultVM<StoreVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
-            int skip = 0, string orderby = nameof(StoreVM.Name), bool desc = false, string search = null)
+            int skip = 0, string orderby = nameof(StoreVM.Name), bool desc = false, string search = null, bool includeInactive = false)
         {
             try
             {
                 // First get a readonly query
                 IQueryable<Store> query = _context.Stores.AsNoTracking();
 
+                // Apply inactive filter
+                if (!includeInactive)
+                {
+                    query = query.Where(e => e.IsActive);
+                }
+
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
                 {
                     query = query.Where(e => e.Name.Contains(search));
                 }
-
+ 
                 // Before ordering or paging, retrieve the total count
                 int totalCount = query.Count();
 

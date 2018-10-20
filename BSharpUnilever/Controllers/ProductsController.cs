@@ -16,7 +16,7 @@ namespace BSharpUnilever.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = "Active")]
     public class ProductsController : ControllerBase
     {
         private const int DEFAULT_PAGE_SIZE = 50;
@@ -35,12 +35,18 @@ namespace BSharpUnilever.Controllers
 
         [HttpGet]
         public async Task<ActionResult<ListResultVM<ProductVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
-            int skip = 0, string orderby = nameof(ProductVM.Id), bool desc = false, string search = null)
+            int skip = 0, string orderby = nameof(ProductVM.Id), bool desc = false, string search = null, bool includeInactive = false)
         {
             try
             {
                 // First get a readonly query
                 IQueryable<Product> query = _context.Products.AsNoTracking();
+
+                // Apply inactive filter
+                if (!includeInactive)
+                {
+                    query = query.Where(e => e.IsActive);
+                }
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))

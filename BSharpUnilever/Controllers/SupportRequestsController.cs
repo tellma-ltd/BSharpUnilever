@@ -24,7 +24,7 @@ namespace BSharpUnilever.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // TODO: Make sure the user is active too
+    [Authorize(Policy = "Active")]
     public class SupportRequestsController : ControllerBase
     {
         private const int DEFAULT_PAGE_SIZE = 50;
@@ -48,7 +48,7 @@ namespace BSharpUnilever.Controllers
 
         [HttpGet]
         public async Task<ActionResult<ListResultVM<SupportRequestVM>>> GetAll(int top = DEFAULT_PAGE_SIZE,
-            int skip = 0, string orderby = nameof(SupportRequestVM.SerialNumber), bool desc = true, string search = null)
+            int skip = 0, string orderby = nameof(SupportRequestVM.SerialNumber), bool desc = true, string search = null, bool includeInactive = false)
         {
             try
             {
@@ -58,6 +58,12 @@ namespace BSharpUnilever.Controllers
                 // Apply row level security: if you are a KAE you only see your records
                 var user = await GetCurrentUserAsync();
                 query = await ApplyRowLevelSecurityAsync(query, user);
+
+                // Apply inactive filter
+                if(!includeInactive)
+                {
+                    query = query.Where(e => e.State != SupportRequestStates.Canceled);
+                }
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
@@ -158,37 +164,46 @@ namespace BSharpUnilever.Controllers
         [HttpGet("generateddocuments/{id}")]
         public async Task<ActionResult> GetGeneratedDocument(int id)
         {
-            // Get the document
-            var creditNote = await _context.GeneratedDocuments
+            try
+            {
+                // Get the document
+                var creditNote = await _context.GeneratedDocuments
                 .Include(e => e.SupportRequest.LineItems)
+                .Include(e => e.SupportRequest.Store)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-            // Make sure it exists and that it isn't void
-            if (creditNote == null)
-            {
-                return NotFound($"Could not find the document with Id={id}");
-            }
-            else if (creditNote.State < 0) // 0 == Void
-            {
-                return BadRequest($"This credit note has been voided");
-            }
-            else
-            {
-                using (MemoryStream resultStream = new MemoryStream())
+                // Make sure it exists and that it isn't void
+                if (creditNote == null)
                 {
-                    PdfWriter writer = new PdfWriter(resultStream);
-                    PdfDocument pdf = new PdfDocument(writer);
-                    Document document = new Document(pdf);
-                    document.Add(new Paragraph($"Unilever Document Number: {creditNote.SupportRequest.SerialNumber:D5}"));
-                    document.Add(new Paragraph($"Credit Note Number: {creditNote.SerialNumber:D2}"));
-                    document.Add(new Paragraph($"Store Name: {creditNote.SupportRequest.Store.Name}"));
-                    document.Add(new Paragraph($"Date: {creditNote.Date}"));
-                    document.Add(new Paragraph($"This credit note is to confirm a credit amount of {creditNote.SupportRequest.LineItems.Sum(e => e.UsedValue):N2} AED")); // AED is hardcoded throughout the app
-                    document.Add(new Paragraph($"Note: This file can be made more pretty"));
-                    document.Close();
-
-                    return File(resultStream.ToArray(), "application/pdf", $"CrNote_SR{creditNote.SupportRequest.SerialNumber:D5}.pdf");
+                    return NotFound($"Could not find the document with Id={id}");
                 }
+                else if (creditNote.State < 0) // 0 == Void
+                {
+                    return BadRequest($"This credit note has been voided");
+                }
+                else
+                {
+                    using (MemoryStream resultStream = new MemoryStream())
+                    {
+                        PdfWriter writer = new PdfWriter(resultStream);
+                        PdfDocument pdf = new PdfDocument(writer);
+                        Document document = new Document(pdf);
+                        document.Add(new Paragraph($"Unilever Document Number: SR{creditNote.SupportRequest.SerialNumber:D5}"));
+                        document.Add(new Paragraph($"Credit Note Number: CN{creditNote.SerialNumber:D5}"));
+                        document.Add(new Paragraph($"Store Name: {creditNote.SupportRequest.Store?.Name}"));
+                        document.Add(new Paragraph($"Date: {creditNote.Date:MMM dd, yyyy}"));
+                        document.Add(new Paragraph($"This credit note is to confirm a credit amount of {creditNote.SupportRequest.LineItems.Sum(e => e.UsedValue):N2} AED")); // AED is hardcoded throughout the app
+                        document.Add(new Paragraph($"Note: This file can be made more pretty"));
+                        document.Close();
+
+                        return File(resultStream.ToArray(), "application/pdf", $"CrNote_SR{creditNote.SupportRequest.SerialNumber:D5}.pdf");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -394,7 +409,7 @@ namespace BSharpUnilever.Controllers
                         // Carry out the deferred actions 
                         foreach (var deferredAction in deferredActions)
                         {
-                           // await deferredAction();
+                            // await deferredAction();
                         }
 
                         scope.Complete();
@@ -788,6 +803,11 @@ namespace BSharpUnilever.Controllers
                 {
                     CheckUser(currentUser, newModel.AccountExecutive);
 
+                    // Make sure has sufficient balance
+                    var balance = CurrentAvailableBalance(currentUser);
+                    if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
+                        throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
+
                     // Generate a new credit note
                     int maxSerial = oldModel.GeneratedDocuments.Max(e => (int?)e.SerialNumber) ?? 0;
                     _context.GeneratedDocuments.Add(new GeneratedDocument
@@ -821,7 +841,7 @@ namespace BSharpUnilever.Controllers
                         // Make sure has sufficient balance
                         var balance = CurrentAvailableBalance(currentUser);
                         if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
-                            throw new InvalidOperationException("");
+                            throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
                     }
 
                     // Generate a new credit note
@@ -888,14 +908,22 @@ namespace BSharpUnilever.Controllers
 
         private decimal CurrentAvailableBalance(User user)
         {
-            // The current available balance of the KAE is all the approved value 
-            // minus the used value of all posted request line items
-            var postedLines = from e in _context.SupportRequestLineItems
-                              where e.SupportRequest.AccountExecutive.UserName == user.UserName &&
-                              e.SupportRequest.State == SupportRequestStates.Posted
-                              select e;
+            // The current available balance of the KAE is all the approved values in (Approved + Posted)
+            // minus the used values of all posted request line items (Posted only)
+            var myRequests = from e in _context.SupportRequestLineItems
+                             where e.SupportRequest.AccountExecutive.UserName == user.UserName
+                             select e;
 
-            return postedLines.Sum(e => (decimal?)(e.ApprovedValue - e.UsedValue)) ?? 0m;
+            var approved = from e in myRequests
+                           where e.SupportRequest.State == SupportRequestStates.Approved || e.SupportRequest.State == SupportRequestStates.Posted
+                           select e.ApprovedValue;
+
+
+            var used = from e in myRequests
+                           where e.SupportRequest.State == SupportRequestStates.Posted
+                           select e.UsedValue;
+
+            return (approved.Sum(e => (decimal?)e) ?? 0m) - (used.Sum(e => (decimal?)e) ?? 0m);
         }
 
         private void PushSendEmail(List<Func<Task>> deferredActions, int requestId, string recipientEmail, string subject, string message)

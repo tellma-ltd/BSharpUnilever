@@ -149,7 +149,7 @@ namespace BSharpUnilever.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "Active")]
         [HttpPost("change-password")]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordVM model)
         {

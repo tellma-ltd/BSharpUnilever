@@ -5,7 +5,7 @@ export class Product {
   SapCode: string;
   Type: string;
   IsPromo: boolean;
-  IsActive: boolean;
+  IsActive = true;
 }
 
 const choicesProductType: { [key: string]: string; } = {

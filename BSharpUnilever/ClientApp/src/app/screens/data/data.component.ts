@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DataService } from '../../data/data.service';
 import { Subject } from 'rxjs';
+import { downloadBlob } from '../../misc/util';
 
 @Component({
   selector: 'b-data',
@@ -30,29 +31,7 @@ export class DataComponent implements OnInit, OnDestroy {
       (blob: Blob) => {
         this.showSpinner = false;
         const fileName = `Support Requests ${new Date().toDateString()}.xlsx`;
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          // To support IE and Edge
-          window.navigator.msSaveOrOpenBlob(blob, fileName);
-        } else {
-
-          // Create an in memory url for the blob, further reading:
-          // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
-          var url = window.URL.createObjectURL(blob);
-
-          // Below is a trick for downloading files without opening
-          // a new window. This is a more elegant user experience
-          var a = document.createElement('a');
-          document.body.appendChild(a);
-          a.setAttribute('style', 'display: none');
-          a.href = url;
-          a.download = fileName;
-          a.click();
-          a.remove();
-
-          // Best practice to prevent a memory leak, especially in a SPA like bSharp
-          window.URL.revokeObjectURL(url);
-        }
+        downloadBlob(blob, fileName);
       },
       (friendlyError: any) => {
         this.showSpinner = false;

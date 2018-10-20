@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { choicesProductType } from '../../data/entities/Product';
+import { choicesProductType, Product } from '../../data/entities/Product';
 import { GlobalsResolverService } from '../../data/globals-resolver.service';
 import { DetailsComponent } from '../../layouts/details/details.component';
 import { ICanDeactivate } from '../../misc/deactivate.guard';
@@ -13,6 +13,12 @@ export class ProductDetailsComponent implements ICanDeactivate {
 
   @ViewChild(DetailsComponent)
   details: DetailsComponent;
+
+  createNew = () => {
+    const result = new Product();
+    result.IsActive = true;
+    return result;
+  };
 
   constructor(private globals: GlobalsResolverService) { }
 

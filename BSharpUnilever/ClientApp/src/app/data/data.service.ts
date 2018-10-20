@@ -61,12 +61,24 @@ export class DataService {
         takeUntil(this.auth.signedOut$)
       );
       return obs$;
+    },
+    getGeneratedDocument: (id: number, cancellationToken$: Observable<void>) => {
+      const url = `api/supportrequests/generateddocuments/${id}`;
+      const obs$ = this.http.get(url, { responseType: 'blob' }).pipe(
+        catchError((error) => {
+          const friendlyError = friendly(error);
+          return throwError(friendlyError);
+        }),
+        takeUntil(cancellationToken$),
+        takeUntil(this.auth.signedOut$)
+      );
+      return obs$;
     }
   };
 
   // Factory methods so as not to repeat ourselves
   private getAllFactory<T>(controller: string) {
-    return (top: number, skip: number, orderBy: string, desc: boolean, search: string, cancellationToken$: Observable<void>) => {
+    return (top: number, skip: number, orderBy: string, desc: boolean, search: string, cancellationToken$: Observable<void>, includeInactive: boolean = false) => {
 
       // Prepare the URL
       const paramsArray: string[] = [
@@ -82,6 +94,9 @@ export class DataService {
       if (!!orderBy) {
         paramsArray.push(`orderBy=${orderBy}`);
         paramsArray.push(`desc=${!!desc}`);
+      }
+      if (includeInactive) {
+        paramsArray.push(`includeInactive=${includeInactive}`);
       }
 
       const params: string = paramsArray.join('&');

@@ -15,13 +15,13 @@ var SupportRequestState;
     SupportRequestState["Canceled"] = "Canceled";
     SupportRequestState["Rejected"] = "Rejected";
 })(SupportRequestState = exports.SupportRequestState || (exports.SupportRequestState = {}));
-var choicesSupportRequestReason = {
-    'DC': 'Display Contract',
-    'PS': 'Premium Support',
-    'PR': 'Price Reduction',
-    'FB': 'From Balance'
+var supportRequestReasons = {
+    DC: 'Display Contract',
+    PS: 'Premium Support',
+    PR: 'Price Reduction',
+    FB: 'From Balance'
 };
-exports.choicesSupportRequestReason = choicesSupportRequestReason;
+exports.supportRequestReasons = supportRequestReasons;
 var SupportRequestLineItem = /** @class */ (function () {
     function SupportRequestLineItem() {
     }

@@ -76,9 +76,11 @@ namespace BSharpUnilever
             services.AddAuthorization(opt =>
             {
                 opt.AddPolicy("AdminOnly", policy => policy.Requirements.Add(new IsAdministratorRequirement()));
+                opt.AddPolicy("Active", policy => policy.Requirements.Add(new IsActiveUserRequirement()));
             });
 
             services.AddScoped<IAuthorizationHandler, IsAdministratorHandler>();
+            services.AddScoped<IAuthorizationHandler, IsActiveUserHandler>();
 
 
             // Register MVC, the JSON options instruct the serializer to keep property names in PascalCase, 

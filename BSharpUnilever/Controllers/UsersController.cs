@@ -43,14 +43,21 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Active")]
         public ActionResult<ListResultVM<UserVM>> GetAll(int top = DEFAULT_PAGE_SIZE, int skip = 0,
                                                         string orderby = nameof(UserVM.FullName),
-                                                        bool desc = false, string search = null)
+                                                        bool desc = false, string search = null, bool includeInactive = false)
         {
             try
             {
                 // First get a readonly query
                 IQueryable<User> query = _context.Users.AsNoTracking();
+
+                // Apply inactive filter
+                if (!includeInactive)
+                {
+                    query = query.Where(e => e.Role != Roles.Inactive);
+                }
 
                 // Apply the searching
                 if (!string.IsNullOrWhiteSpace(search))
@@ -96,6 +103,7 @@ namespace BSharpUnilever.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "Active")]
         public async Task<ActionResult<UserVM>> Get(string id)
         {
             try

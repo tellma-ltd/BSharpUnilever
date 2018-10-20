@@ -4,11 +4,12 @@ import { catchError, map } from 'rxjs/operators';
 import { DataService } from '../../data/data.service';
 import { Product } from '../../data/entities/Product';
 import { Store } from '../../data/entities/Store';
-import { SupportRequest, SupportRequestLineItem, SupportRequestState, supportRequestReasons } from '../../data/entities/SupportRequest';
+import { SupportRequest, SupportRequestLineItem, SupportRequestState, supportRequestReasons, GeneratedDocument } from '../../data/entities/SupportRequest';
 import { User } from '../../data/entities/User';
 import { GlobalsResolverService } from '../../data/globals-resolver.service';
 import { DetailsComponent } from '../../layouts/details/details.component';
-import { cloneModel } from '../../misc/util';
+import { cloneModel, downloadBlob } from '../../misc/util';
+import { SerialPipe } from '../../misc/serial.pipe';
 
 @Component({
   selector: 'b-support-request-details',
@@ -17,14 +18,17 @@ import { cloneModel } from '../../misc/util';
 })
 export class SupportRequestDetailsComponent implements OnDestroy {
 
-  PREFIX = 'SR';
-
   @ViewChild(DetailsComponent)
   details: DetailsComponent;
 
-  constructor(private globals: GlobalsResolverService, private data: DataService) { }
-
+  public PREFIX = 'SR';
   private notifyDestruct$ = new Subject<void>();
+  public showSpinner = false;
+  public userFormatter = (user: User) => `${user.FullName} (${user.Role})`;
+  public storeFormatter = (store: Store) => store.Name;
+  public productFormatter = (product: Product) => product.Description;
+
+  constructor(private globals: GlobalsResolverService, private data: DataService) { }
 
   ngOnDestroy() {
     this.notifyDestruct$.next();
@@ -72,11 +76,23 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     return !!key ? supportRequestReasons[key] : '';
   }
 
-  userFormatter = (user: User) => user.FullName;
-  storeFormatter = (store: Store) => store.Name;
-  productFormatter = (product: Product) => product.Description;
+  onDownloadCreditNote(cn: GeneratedDocument) {
+    this.showSpinner = true;
+    this.data.supportrequests.getGeneratedDocument(cn.Id, this.notifyDestruct$).subscribe(
+      (blob: Blob) => {
+        this.showSpinner = false;
+        const serial = new SerialPipe().transform(cn.SerialNumber, 'CN');
+        const fileName = `${serial} ${new Date().toDateString()}.pdf`;
+        downloadBlob(blob, fileName);
+      },
+      () => {
+        this.showSpinner = false;
+        this.details.showModalError('Could not download the file, please contact your IT department');
+      }
+    );
+  }
 
-  addLine(model: SupportRequest) {
+  onAddLine(model: SupportRequest) {
     let newLine = new SupportRequestLineItem();
     newLine['isNew'] = true; // This focuses the new line
 
@@ -86,31 +102,12 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     model.LineItems.push(newLine);
   }
 
-  deleteLine(index: number, model: SupportRequest) {
+  onDeleteLine(index: number, model: SupportRequest) {
 
     let lineItems = model.LineItems;
     lineItems.splice(index, 1);
   }
 
-  private goToState(model: SupportRequest, state: SupportRequestState) {
-    let clone = cloneModel(model);
-    clone.State = state;
-    this.data.supportrequests.post(clone, this.notifyDestruct$).pipe(
-      map((result: any) => {
-        this.details.viewModel = result;
-      }),
-      catchError(friendlyError => {
-        this.details.showModalError(friendlyError);
-        return of(null);
-      })
-    ).subscribe();
-  }
-
-  private getPreviousState(model: SupportRequest) {
-
-  }
-
-  // Submit
   isVisibleSubmit(model: SupportRequest): boolean {
     const currentRole = this.globals.currentUser.Role;
     return !!model.Id &&
@@ -123,7 +120,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Submitted);
   }
 
-  // Approve
   isVisibleApprove(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
     return !!model.Id &&
@@ -135,7 +131,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Approved);
   }
 
-  // Reject
   isVisibleReject(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -148,7 +143,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Rejected);
   }
 
-  // Post
   isVisiblePost(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -162,7 +156,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Posted);
   }
 
-  // Un-Reject
   isVisibleUnReject(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -175,7 +168,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Submitted);
   }
 
-  // Cancel
   isVisibleCancel(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -188,7 +180,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Canceled);
   }
 
-  // Un-Cancel
   isVisibleUnCancel(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -201,7 +192,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     this.goToState(model, SupportRequestState.Draft);
   }
 
-  // Un-Post
   isVisibleUnPost(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
 
@@ -211,12 +201,14 @@ export class SupportRequestDetailsComponent implements OnDestroy {
   }
 
   onUnPost(model: SupportRequest) {
-    const stateChanges = model.StateChanges;
-    const previousState = stateChanges[stateChanges.length - 1].FromState;
-    this.goToState(model, previousState);
+    const confirmed = confirm('This action will invalidate the generated credit note, are you sure you want to proceed?');
+    if (confirmed) {
+      const stateChanges = model.StateChanges;
+      const previousState = stateChanges[stateChanges.length - 1].FromState;
+      this.goToState(model, previousState);
+    }
   }
 
-  // Return
   isVisibleReturn(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
     const approved = SupportRequestState.Approved;
@@ -238,7 +230,6 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     return model.State === 'Draft';
   }
 
-  // Hides items on demand
   isVisibleHeaderRequestedValue(model: SupportRequest) {
     return ['DC', 'PS'].includes(model.Reason);
   }
@@ -358,5 +349,19 @@ export class SupportRequestDetailsComponent implements OnDestroy {
   isEditableUsedSupport(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
     return ['KAE', 'Administrator'].includes(currentRole) && [SupportRequestState.Draft, SupportRequestState.Submitted, SupportRequestState.Approved].includes(model.State);
+  }
+
+  private goToState(model: SupportRequest, state: SupportRequestState) {
+    let clone = cloneModel(model);
+    clone.State = state;
+    this.data.supportrequests.post(clone, this.notifyDestruct$).pipe(
+      map((result: any) => {
+        this.details.viewModel = result;
+      }),
+      catchError(friendlyError => {
+        this.details.showModalError(friendlyError);
+        return of(null);
+      })
+    ).subscribe();
   }
 }

@@ -26,6 +26,9 @@
 
       <!-- Right Buttons -->
       <div>
+        <ng-container *ngTemplateOutlet="toolbarExtrasTemplate; context: { bag: bag }">
+        </ng-container>
+
         <!-- Paging -->
         <div class="d-inline small mr-2 ml-2">
           <span class="b-vertical-align-middle">{{ from | number }}-{{ to | number }}</span>

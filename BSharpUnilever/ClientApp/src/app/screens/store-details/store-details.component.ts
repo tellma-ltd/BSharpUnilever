@@ -3,6 +3,7 @@ import { User } from '../../data/entities/User';
 import { GlobalsResolverService } from '../../data/globals-resolver.service';
 import { DetailsComponent } from '../../layouts/details/details.component';
 import { ICanDeactivate } from '../../misc/deactivate.guard';
+import { Store } from '../../data/entities/Store';
 
 @Component({
   selector: 'b-store-details',
@@ -13,6 +14,12 @@ export class StoreDetailsComponent implements ICanDeactivate {
 
   @ViewChild(DetailsComponent)
   details: DetailsComponent;
+
+  createNew = () => {
+    const result = new Store();
+    result.IsActive = true;
+    return result;
+  };
 
   constructor(private globals: GlobalsResolverService) { }
 

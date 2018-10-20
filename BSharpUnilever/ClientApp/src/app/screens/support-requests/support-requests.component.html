@@ -1,4 +1,5 @@
 <b-master controller="supportrequests"
+          [toolbarExtrasTemplate]="toolbarExtras"
           [tileTemplate]="tile"
           [tableDefinition]="[
               { display: 'Serial No.', orderBy: 'SerialNumber' },
@@ -36,10 +37,16 @@
   <td class="text-right">{{ requestedValue(model) | number:'1.2-2' }} AED</td>
 </ng-template>
 
-
 <ng-template #stateTemplate let-model="model">
   <span class="text-white pl-1 pr-1"
         [class.bg-secondary]="model.State === 'Submitted' || model.State === 'Draft'"
         [class.bg-dark]="model.State === 'Approved'" [class.bg-danger]="model.State === 'Rejected'"
         [class.bg-warning]="model.State === 'Canceled'" [class.bg-success]="model.State === 'Posted'">{{ model.State }}</span>
+</ng-template>
+
+<ng-template #toolbarExtras let-bag="bag">
+  <div class="d-inline small mr-2 ml-2" *ngIf="bag && showMyBalance">
+    <span class="d-none d-sm-inline b-vertical-align-middle">My Balance:&nbsp;</span>
+    <span class="b-vertical-align-middle">{{ bag.AvailableBalance | number:'1.2-2' }} AED</span>
+  </div>
 </ng-template>
