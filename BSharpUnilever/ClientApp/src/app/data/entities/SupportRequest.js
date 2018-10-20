@@ -24,6 +24,13 @@ var supportRequestReasons = {
 exports.supportRequestReasons = supportRequestReasons;
 var SupportRequestLineItem = /** @class */ (function () {
     function SupportRequestLineItem() {
+        this.Quantity = 0;
+        this.RequestedSupport = 0;
+        this.RequestedValue = 0;
+        this.ApprovedSupport = 0;
+        this.ApprovedValue = 0;
+        this.UsedSupport = 0;
+        this.UsedValue = 0;
     }
     return SupportRequestLineItem;
 }());

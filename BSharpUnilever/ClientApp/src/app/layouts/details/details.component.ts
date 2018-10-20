@@ -63,7 +63,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
   canUpdatePred: () => boolean;
 
   @Input()
-  enableEditButtonPred: (model: any) => boolean = () => true;
+  enableEditButtonPred: (model: any) => boolean = () => true
 
   @Input()
   createNew: () => any = () => ({})
@@ -132,7 +132,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (this.isEdit) {
       const proceed = confirm('Your changes will be discarded, are you sure you would like to proceed?');
       if (proceed) {
-        // this.onCancel();
         return true;
       } else {
         return false;
@@ -293,6 +292,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     const isNew = !(this.editModel.Id);
 
     if (isNew) {
+
+      // To avoid null reference errors
+      this._viewModel = this._editModel;
 
       // To avoid a confirmation modal
       this.detailsStatus = DetailsStatus.loaded;

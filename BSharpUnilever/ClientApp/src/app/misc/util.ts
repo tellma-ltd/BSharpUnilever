@@ -15,8 +15,7 @@ export function friendly(error: any) {
         if (error.error instanceof Blob) {
           // Need a better solution to handle blobs
           result = 'Unknown error';
-        }
-        else {
+        } else {
           result = error.error;
         }
         break;
@@ -66,11 +65,11 @@ export function downloadBlob(blob: Blob, fileName: string) {
 
     // Create an in memory url for the blob, further reading:
     // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
-    var url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
 
     // Below is a trick for downloading files without opening
     // a new window. This is a more elegant user experience
-    var a = document.createElement('a');
+    const a = document.createElement('a');
     document.body.appendChild(a);
     a.setAttribute('style', 'display: none');
     a.href = url;

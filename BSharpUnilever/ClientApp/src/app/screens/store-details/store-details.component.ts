@@ -19,7 +19,7 @@ export class StoreDetailsComponent implements ICanDeactivate {
     const result = new Store();
     result.IsActive = true;
     return result;
-  };
+  }
 
   constructor(private globals: GlobalsResolverService) { }
 

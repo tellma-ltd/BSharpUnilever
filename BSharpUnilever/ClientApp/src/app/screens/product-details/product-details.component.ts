@@ -18,7 +18,7 @@ export class ProductDetailsComponent implements ICanDeactivate {
     const result = new Product();
     result.IsActive = true;
     return result;
-  };
+  }
 
   constructor(private globals: GlobalsResolverService) { }
 

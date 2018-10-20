@@ -4,12 +4,15 @@ import { catchError, map } from 'rxjs/operators';
 import { DataService } from '../../data/data.service';
 import { Product } from '../../data/entities/Product';
 import { Store } from '../../data/entities/Store';
-import { SupportRequest, SupportRequestLineItem, SupportRequestState, supportRequestReasons, GeneratedDocument } from '../../data/entities/SupportRequest';
+import {
+  GeneratedDocument, SupportRequest, SupportRequestLineItem,
+  supportRequestReasons, SupportRequestState
+} from '../../data/entities/SupportRequest';
 import { User } from '../../data/entities/User';
 import { GlobalsResolverService } from '../../data/globals-resolver.service';
 import { DetailsComponent } from '../../layouts/details/details.component';
-import { cloneModel, downloadBlob } from '../../misc/util';
 import { SerialPipe } from '../../misc/serial.pipe';
+import { cloneModel, downloadBlob } from '../../misc/util';
 
 @Component({
   selector: 'b-support-request-details',
@@ -50,17 +53,15 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     }
 
     return result;
-  };
+  }
 
   enableEditButton = (model: SupportRequest) => {
     const currentRole = this.globals.currentUser.Role;
     if (model.State === SupportRequestState.Draft) {
       return true;
-    }
-    else if (model.State === SupportRequestState.Submitted) {
+    } else if (model.State === SupportRequestState.Submitted) {
       return ['Manager', 'Administrator'].includes(currentRole);
-    }
-    else if (model.State === SupportRequestState.Approved) {
+    } else if (model.State === SupportRequestState.Approved) {
       return ['KAE', 'Administrator'].includes(currentRole);
     } else {
       return false;
@@ -93,18 +94,19 @@ export class SupportRequestDetailsComponent implements OnDestroy {
   }
 
   onAddLine(model: SupportRequest) {
-    let newLine = new SupportRequestLineItem();
+    const newLine = new SupportRequestLineItem();
     newLine['isNew'] = true; // This focuses the new line
 
-    if (!model.LineItems)
+    if (!model.LineItems) {
       model.LineItems = [];
+    }
 
     model.LineItems.push(newLine);
   }
 
   onDeleteLine(index: number, model: SupportRequest) {
 
-    let lineItems = model.LineItems;
+    const lineItems = model.LineItems;
     lineItems.splice(index, 1);
   }
 
@@ -221,7 +223,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
   }
 
   onReturn(model: SupportRequest) {
-    let previousState = SupportRequestState.Draft;
+    const previousState = SupportRequestState.Draft;
 
     this.goToState(model, previousState);
   }
@@ -242,7 +244,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
   isVisibleHeaderUsedValue(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
     return (model.Reason === 'FB' &&
-      model.State == SupportRequestState.Draft &&
+      model.State === SupportRequestState.Draft &&
       ['Administrator', 'KAE'].includes(currentRole)) ||
       (['DC', 'PS'].includes(model.Reason) && this.isVisibleUsedValue(model));
   }
@@ -264,9 +266,10 @@ export class SupportRequestDetailsComponent implements OnDestroy {
 
 
 
-    return !(currentRole == 'KAE' && model.State === SupportRequestState.Submitted) &&
+    return !(currentRole === 'KAE' && model.State === SupportRequestState.Submitted) &&
       ((['Administrator', 'Manager'].includes(currentRole) && model.State === SupportRequestState.Draft) ||
-        [SupportRequestState.Submitted, SupportRequestState.Approved, SupportRequestState.Rejected, SupportRequestState.Posted].includes(model.State));
+        [SupportRequestState.Submitted, SupportRequestState.Approved,
+          SupportRequestState.Rejected, SupportRequestState.Posted].includes(model.State));
   }
 
   isVisibleUsedSupport(model: SupportRequest) {
@@ -343,16 +346,18 @@ export class SupportRequestDetailsComponent implements OnDestroy {
 
   isEditableApprovedSupport(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
-    return ['Manager', 'Administrator'].includes(currentRole) && [SupportRequestState.Draft, SupportRequestState.Submitted].includes(model.State);
+    return ['Manager', 'Administrator'].includes(currentRole) &&
+      [SupportRequestState.Draft, SupportRequestState.Submitted].includes(model.State);
   }
 
   isEditableUsedSupport(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
-    return ['KAE', 'Administrator'].includes(currentRole) && [SupportRequestState.Draft, SupportRequestState.Submitted, SupportRequestState.Approved].includes(model.State);
+    return ['KAE', 'Administrator'].includes(currentRole) &&
+      [SupportRequestState.Draft, SupportRequestState.Submitted, SupportRequestState.Approved].includes(model.State);
   }
 
   private goToState(model: SupportRequest, state: SupportRequestState) {
-    let clone = cloneModel(model);
+    const clone = cloneModel(model);
     clone.State = state;
     this.data.supportrequests.post(clone, this.notifyDestruct$).pipe(
       map((result: any) => {

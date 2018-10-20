@@ -30,8 +30,8 @@
         <span class="b-vertical-align-middle">Key Account Executive</span>
       </div>
       <div class="col-12 col-lg-8">
-        <a *ngIf="!isEdit" [routerLink]="['../../users', model?.AccountExecutive?.Id]">{{model?.AccountExecutive?.FullName}}</a>
-        <b-details-picker *ngIf="isEdit" [(ngModel)]="model.AccountExecutive" controller="users" [formatter]="userFormatter" required
+        <a *ngIf="!isEdit && model?.AccountExecutive?.Id" [routerLink]="['../../users', model?.AccountExecutive?.Id]">{{model?.AccountExecutive?.FullName}}</a>
+        <b-details-picker *ngIf="isEdit" [(ngModel)]="model.AccountExecutive" controller="users" [formatter]="userFormatter"
                           #accountExecControl="ngModel" [class.is-invalid]="accountExecControl.invalid && accountExecControl.touched">
         </b-details-picker>
       </div>

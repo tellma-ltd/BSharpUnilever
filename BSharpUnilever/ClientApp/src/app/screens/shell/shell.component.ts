@@ -37,7 +37,7 @@ export class ShellComponent {
   }
 
   get canViewData(): boolean {
-    return this.globals.currentUser.Role === "Manager" ||
-      this.globals.currentUser.Role === "Administrator";
+    return this.globals.currentUser.Role === 'Manager' ||
+      this.globals.currentUser.Role === 'Administrator';
   }
 }

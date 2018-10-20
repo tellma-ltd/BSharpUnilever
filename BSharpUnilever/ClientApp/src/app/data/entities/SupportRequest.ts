@@ -42,13 +42,13 @@ export { supportRequestReasons };
 export class SupportRequestLineItem {
   Id: number;
   Product: Product;
-  Quantity: number;
-  RequestedSupport: number;
-  RequestedValue: number;
-  ApprovedSupport: number;
-  ApprovedValue: number;
-  UsedSupport: number;
-  UsedValue: number;
+  Quantity = 0;
+  RequestedSupport = 0;
+  RequestedValue = 0;
+  ApprovedSupport = 0;
+  ApprovedValue = 0;
+  UsedSupport = 0;
+  UsedValue = 0;
 }
 
 export class StateChange {

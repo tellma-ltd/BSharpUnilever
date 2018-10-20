@@ -78,7 +78,8 @@ export class DataService {
 
   // Factory methods so as not to repeat ourselves
   private getAllFactory<T>(controller: string) {
-    return (top: number, skip: number, orderBy: string, desc: boolean, search: string, cancellationToken$: Observable<void>, includeInactive: boolean = false) => {
+    return (top: number, skip: number, orderBy: string, desc: boolean, search: string,
+      cancellationToken$: Observable<void>, includeInactive: boolean = false) => {
 
       // Prepare the URL
       const paramsArray: string[] = [

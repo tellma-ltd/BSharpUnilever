@@ -320,14 +320,14 @@
 
 <!-- Sidebar -->
 <ng-template #sidebar let-model="model" let-isEdit="isEdit">
-  <div class="d-flex justify-content-center" *ngIf="!!model.GeneratedDocuments && model.GeneratedDocuments.length > 0">
+  <div class="d-flex justify-content-center">
     <div class="w-100 b-paper">
       <div class="row m-0 pl-1 pl-sm-3 pr-1 pr-sm-3 pt-3 pt-sm-4 pb-3 pb-sm-5">
-        <h6 class="col-12">Generated Credit Note: </h6>
+        <h6 class="col-12">Generated Credit Notes: </h6>
         <div class="m-1" style="float:left" *ngFor="let cn of model.GeneratedDocuments; let i = index">
           <button class="btn btn-primary" [disabled]="cn.State < 0" (click)="onDownloadCreditNote(cn)">
             <s *ngIf="cn.State < 0">{{ cn.SerialNumber | bSerial:'CN' }}</s>
-            <span *ngIf="cn.State === 0">{{ cn.SerialNumber | bSerial:'CN' }}</span>
+            <span *ngIf="cn.State === 0"><fa-icon icon="download"></fa-icon>&nbsp;&nbsp;{{ cn.SerialNumber | bSerial:'CN' }}</span>
           </button>
         </div>
         <div class="btn m-1" *ngIf="showSpinner">
@@ -335,7 +335,11 @@
             <b-spinner></b-spinner>&nbsp;&nbsp;Downloading...
           </span>
         </div>
-
+        <div class="btn m-1" *ngIf="!model.GeneratedDocuments || model.GeneratedDocuments.length === 0">
+          <span>
+            None
+          </span>
+        </div>
       </div>
     </div>
   </div>

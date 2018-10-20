@@ -40,6 +40,7 @@ export class ResetPasswordControlComponent implements OnInit {
     if (this.password !== this.confirmPassword) {
       this.errorMessage = `Make sure the passwords match`;
     } else {
+      this.showSpinner = true;
       this.auth.resetPassword(this.userId, this.passwordResetToken, this.password).subscribe(
         () => {
           this.showSpinner = false;

@@ -60,7 +60,7 @@ namespace BSharpUnilever.Controllers
                 query = await ApplyRowLevelSecurityAsync(query, user);
 
                 // Apply inactive filter
-                if(!includeInactive)
+                if (!includeInactive)
                 {
                     query = query.Where(e => e.State != SupportRequestStates.Canceled);
                 }
@@ -126,7 +126,7 @@ namespace BSharpUnilever.Controllers
                 if (user.Role == Roles.KAE)
                 {
                     result.Bag = new Dictionary<string, object>();
-                    result.Bag["AvailableBalance"] = CurrentAvailableBalance(user);
+                    result.Bag["AvailableBalance"] = CurrentAvailableBalance(user.Email);
                 }
 
                 // Finally return the result
@@ -409,7 +409,7 @@ namespace BSharpUnilever.Controllers
                         // Carry out the deferred actions 
                         foreach (var deferredAction in deferredActions)
                         {
-                            // await deferredAction();
+                            await deferredAction();
                         }
 
                         scope.Complete();
@@ -804,7 +804,7 @@ namespace BSharpUnilever.Controllers
                     CheckUser(currentUser, newModel.AccountExecutive);
 
                     // Make sure has sufficient balance
-                    var balance = CurrentAvailableBalance(currentUser);
+                    var balance = CurrentAvailableBalance(newModel.AccountExecutive.Email);
                     if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
                         throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
 
@@ -839,7 +839,7 @@ namespace BSharpUnilever.Controllers
                     else
                     {
                         // Make sure has sufficient balance
-                        var balance = CurrentAvailableBalance(currentUser);
+                        var balance = CurrentAvailableBalance(newModel.AccountExecutive.Email);
                         if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
                             throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
                     }
@@ -871,8 +871,6 @@ namespace BSharpUnilever.Controllers
                     foreach (var line in newModel.LineItems)
                     {
                         // Copy the values from requested to approved by default
-                        line.RequestedSupport = 0;
-                        line.RequestedValue = 0;
                         line.UsedSupport = line.ApprovedSupport;
                         line.UsedValue = line.ApprovedValue;
                     }
@@ -906,12 +904,12 @@ namespace BSharpUnilever.Controllers
             return Task.FromResult(deferredActions);
         }
 
-        private decimal CurrentAvailableBalance(User user)
+        private decimal CurrentAvailableBalance(string userName)
         {
             // The current available balance of the KAE is all the approved values in (Approved + Posted)
             // minus the used values of all posted request line items (Posted only)
             var myRequests = from e in _context.SupportRequestLineItems
-                             where e.SupportRequest.AccountExecutive.UserName == user.UserName
+                             where e.SupportRequest.AccountExecutive.UserName == userName
                              select e;
 
             var approved = from e in myRequests
@@ -920,8 +918,8 @@ namespace BSharpUnilever.Controllers
 
 
             var used = from e in myRequests
-                           where e.SupportRequest.State == SupportRequestStates.Posted
-                           select e.UsedValue;
+                       where e.SupportRequest.State == SupportRequestStates.Posted
+                       select e.UsedValue;
 
             return (approved.Sum(e => (decimal?)e) ?? 0m) - (used.Sum(e => (decimal?)e) ?? 0m);
         }

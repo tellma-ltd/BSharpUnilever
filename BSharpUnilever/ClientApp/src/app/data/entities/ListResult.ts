@@ -4,6 +4,6 @@ export class ListResult<T> {
   OrderBy: string;
   Desc: boolean;
   TotalCount: number;
-  Bag: { [key: string]: any }
+  Bag: { [key: string]: any };
   Data: T[];
 }
