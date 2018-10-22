@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
+import { tap, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
@@ -22,6 +23,14 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       });
     }
 
-    return next.handle(req);
+    // Here we intercept responses and sign the user out if we get a 401 back
+    return next.handle(req).pipe(
+      catchError(err => {
+        if (err instanceof HttpErrorResponse && err.status === 401) {
+          this.auth.signOutAndChallengeUser();
+        }
+        return throwError(err);
+      })
+    );
   }
 }

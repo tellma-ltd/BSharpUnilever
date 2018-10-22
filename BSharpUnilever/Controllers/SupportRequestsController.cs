@@ -4,10 +4,12 @@ using BSharpUnilever.Controllers.ViewModels;
 using BSharpUnilever.Data;
 using BSharpUnilever.Data.Entities;
 using BSharpUnilever.Services;
+using iText.Html2pdf;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,15 +37,17 @@ namespace BSharpUnilever.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IHostingEnvironment _env;
 
         public SupportRequestsController(BSharpContext context, IMapper mapper, ILogger<UsersController> logger,
-            UserManager<User> userManager, IEmailSender emailSender)
+            UserManager<User> userManager, IEmailSender emailSender, IHostingEnvironment env)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
             _userManager = userManager;
             _emailSender = emailSender;
+            _env = env;
         }
 
         [HttpGet]
@@ -170,6 +174,8 @@ namespace BSharpUnilever.Controllers
                 var creditNote = await _context.GeneratedDocuments
                 .Include(e => e.SupportRequest.LineItems)
                 .Include(e => e.SupportRequest.Store)
+                .Include(e => e.SupportRequest.AccountExecutive)
+                .Include(e => e.SupportRequest.Manager)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
                 // Make sure it exists and that it isn't void
@@ -183,20 +189,25 @@ namespace BSharpUnilever.Controllers
                 }
                 else
                 {
+                    // Retrieve the HTML template
+                    var path = Path.Combine(_env.ContentRootPath, "Templates/CreditNoteTemplate.html");
+                    var htmlSource = string.Join("\n\r", System.IO.File.ReadLines(path));
+
+                    // Put real values in place of placeholders
+                    htmlSource = htmlSource.Replace("{{Date}}", creditNote.Date.ToString("MMM dd, yyyy"));
+                    htmlSource = htmlSource.Replace("{{SupportRequest.SerialNumber}}", "SR" + creditNote.SupportRequest.SerialNumber.ToString("D5"));
+                    htmlSource = htmlSource.Replace("{{SerialNumber}}", "CN" + creditNote.SerialNumber.ToString("D5"));
+                    htmlSource = htmlSource.Replace("{{SupportRequest.Store.Name}}", creditNote.SupportRequest.Store?.Name);
+                    htmlSource = htmlSource.Replace("{{SupportRequest.UsedValue}}", creditNote.SupportRequest.LineItems.Sum(e => e.UsedValue).ToString("N2"));
+                    htmlSource = htmlSource.Replace("{{SupportRequest.AccountExecutive.FullName}}", creditNote.SupportRequest.AccountExecutive?.FullName);
+                    htmlSource = htmlSource.Replace("{{SupportRequest.Manager.FullName}}", creditNote.SupportRequest.Manager?.FullName);
+
                     using (MemoryStream resultStream = new MemoryStream())
                     {
-                        PdfWriter writer = new PdfWriter(resultStream);
-                        PdfDocument pdf = new PdfDocument(writer);
-                        Document document = new Document(pdf);
-                        document.Add(new Paragraph($"Unilever Document Number: SR{creditNote.SupportRequest.SerialNumber:D5}"));
-                        document.Add(new Paragraph($"Credit Note Number: CN{creditNote.SerialNumber:D5}"));
-                        document.Add(new Paragraph($"Store Name: {creditNote.SupportRequest.Store?.Name}"));
-                        document.Add(new Paragraph($"Date: {creditNote.Date:MMM dd, yyyy}"));
-                        document.Add(new Paragraph($"This credit note is to confirm a credit amount of {creditNote.SupportRequest.LineItems.Sum(e => e.UsedValue):N2} AED")); // AED is hardcoded throughout the app
-                        document.Add(new Paragraph($"Note: This file can be made more pretty"));
-                        document.Close();
+                        ConverterProperties converterProperties = new ConverterProperties();
+                        HtmlConverter.ConvertToPdf(htmlSource, resultStream, converterProperties);
 
-                        return File(resultStream.ToArray(), "application/pdf", $"CrNote_SR{creditNote.SupportRequest.SerialNumber:D5}.pdf");
+                        return File(resultStream.ToArray(), "application/pdf");
                     }
                 }
             }
@@ -779,6 +790,11 @@ namespace BSharpUnilever.Controllers
                     // (1) Check roles
                     CheckRoles(currentUser, Roles.KAE);
 
+                    if (newModel.Reason == Reasons.FromBalance)
+                    {
+                        throw new InvalidOperationException($"Support requests from balance should be posted straight away");
+                    }
+
                     // (2) Set default values
                     if (currentUser.Role != Roles.Administrator)
                     {
@@ -885,7 +901,7 @@ namespace BSharpUnilever.Controllers
                     // Make sure has sufficient balance
                     var balance = CurrentAvailableBalance(newModel.AccountExecutive.Email);
                     if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
-                        throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
+                        throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2} AED");
 
                     // Generate a new credit note
                     int maxSerial = oldModel.GeneratedDocuments.Max(e => (int?)e.SerialNumber) ?? 0;
@@ -908,7 +924,7 @@ namespace BSharpUnilever.Controllers
 
                 else if (originalState == SupportRequestStates.Draft && newState == SupportRequestStates.Posted)
                 {
-                    CheckRoles(currentUser, Roles.KAE);
+                    CheckUser(currentUser, newModel.AccountExecutive);
 
                     if (newModel.Reason != Reasons.FromBalance)
                     {
@@ -920,7 +936,7 @@ namespace BSharpUnilever.Controllers
                         // Make sure has sufficient balance
                         var balance = CurrentAvailableBalance(newModel.AccountExecutive.Email);
                         if (newModel.LineItems.Sum(e => e.UsedValue) > balance)
-                            throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2}");
+                            throw new InvalidOperationException($"Your cannot exceed your current balance of {balance:N2} AED");
                     }
 
                     // Generate a new credit note
@@ -945,6 +961,11 @@ namespace BSharpUnilever.Controllers
                 {
                     // (1) Check Roles
                     CheckRoles(currentUser, Roles.Manager);
+
+                    if (newModel.Reason == Reasons.FromBalance)
+                    {
+                        throw new InvalidOperationException($"Support requests from balance should be posted straight away");
+                    }
 
                     // (2) Set default values
                     foreach (var line in newModel.LineItems)

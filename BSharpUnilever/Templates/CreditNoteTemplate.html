@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style>
+        * {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        .logo {
+            float: right;
+            height: 120px;
+        }
+
+        .table-container {
+            padding: 160px 10px 10px 10px;
+        }
+
+        .container {
+            padding: 10px;
+        }
+
+        .table {
+            width: 100%;
+            border-spacing: 0px;
+            border-top: 1px solid grey;
+        }
+
+            .table td {
+                padding: 6px;
+                border-right: 1px solid grey;
+                border-bottom: 1px solid grey;
+            }
+
+                .table td:first-child {
+                    border-left: 1px solid grey;
+                    font-weight: bold;
+                }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .p {
+            font-size: medium;
+        }
+
+        .min-width {
+            min-width: 140px;
+        }
+
+        .header {
+            float: left;
+            padding-left: 20px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <img class="logo" src="Templates/Logo.jpg" />
+    <div class="table-container">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>Date</td>
+                    <td>{{Date}}</td>
+                </tr>
+                <tr>
+                    <td>Document Number</td>
+                    <td>{{SupportRequest.SerialNumber}}</td>
+                </tr>
+                <tr>
+                    <td>Credit Note Number</td>
+                    <td>{{SerialNumber}}</td>
+                </tr>
+                <tr>
+                    <td>Store Name</td>
+                    <td>{{SupportRequest.Store.Name}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <div class="container">
+        <p class="p">This credit note is to confirm a credit amount of {{SupportRequest.UsedValue}} AED</p>
+    </div>
+    <div class="container">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="min-width"><span class="bold">Issued by:</span></td>
+                    <td>{{SupportRequest.AccountExecutive.FullName}}</td>
+                </tr>
+                <tr>
+                    <td class="min-width"><span class="bold">Verified by:</span></td>
+                    <td>
+                        {{SupportRequest.Manager.FullName}}
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

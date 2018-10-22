@@ -110,14 +110,9 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     lineItems.splice(index, 1);
   }
 
-  onFocusOut(li: SupportRequestLineItem) {
-    // if(!li.Product && !li.Quantity)
-    console.log('Focus Out!');
-  }
-
   isVisibleSubmit(model: SupportRequest): boolean {
     const currentRole = this.globals.currentUser.Role;
-    return !!model.Id &&
+    return !!model.Id && model.Reason !== 'FB' &&
       [SupportRequestState.Draft].includes(model.State) &&
       ['KAE', 'Administrator'].includes(currentRole);
   }
@@ -129,7 +124,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
 
   isVisibleApprove(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
-    return !!model.Id &&
+    return !!model.Id && model.Reason !== 'FB' &&
       [SupportRequestState.Draft, SupportRequestState.Submitted].includes(model.State) &&
       ['Manager', 'Administrator'].includes(currentRole);
   }
@@ -248,9 +243,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
 
   isVisibleHeaderUsedValue(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
-    return (model.Reason === 'FB' &&
-      model.State === SupportRequestState.Draft &&
-      ['Administrator', 'KAE'].includes(currentRole)) ||
+    return (model.Reason === 'FB') ||
       (['DC', 'PS'].includes(model.Reason) && this.isVisibleUsedValue(model));
   }
 
@@ -274,7 +267,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
     return !(currentRole === 'KAE' && model.State === SupportRequestState.Submitted) &&
       ((['Administrator', 'Manager'].includes(currentRole) && model.State === SupportRequestState.Draft) ||
         [SupportRequestState.Submitted, SupportRequestState.Approved,
-          SupportRequestState.Rejected, SupportRequestState.Posted].includes(model.State));
+        SupportRequestState.Rejected, SupportRequestState.Posted].includes(model.State));
   }
 
   isVisibleUsedSupport(model: SupportRequest) {
@@ -330,7 +323,7 @@ export class SupportRequestDetailsComponent implements OnDestroy {
 
   isEditableManager(model: SupportRequest) {
     const currentRole = this.globals.currentUser.Role;
-    return model.State === SupportRequestState.Draft || (currentRole === 'Administrator' && model.State !== SupportRequestState.Submitted);
+    return model.State === SupportRequestState.Draft || (currentRole === 'Administrator' && model.State === SupportRequestState.Submitted);
   }
 
   isEditableHeaderRequestedValue(model: SupportRequest) {
